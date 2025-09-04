@@ -1,4 +1,4 @@
-name: Unzip and Commit
+name: Unzip and Commit (Safe)
 on:
   workflow_dispatch:
   push:
@@ -19,10 +19,16 @@ jobs:
           unzip -o Cost-Forge-2.2-full.zip -d extracted
           rm Cost-Forge-2.2-full.zip
 
-      - name: Move files to root
+      - name: Move files (skip .github)
         run: |
           shopt -s dotglob
-          mv extracted/* .
+          for f in extracted/*; do
+            if [ "$(basename "$f")" = ".github" ]; then
+              echo "Skip .github folder"
+            else
+              mv -f "$f" .
+            fi
+          done
           rm -rf extracted
 
       - name: Commit changes
@@ -30,5 +36,5 @@ jobs:
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git add .
-          git commit -m "Unzipped and committed contents"
+          git commit -m "Unzipped and committed contents (skip .github)"
           git push
