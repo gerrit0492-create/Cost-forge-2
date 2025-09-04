@@ -1,74 +1,90 @@
-name: Unzip and Commit (First-Time-Right)
+name: Unpack ZIP (No-MV, Safe, First-Time-Right)
 
 on:
   workflow_dispatch:
+    inputs:
+      zip:
+        description: "Zip-bestandsnaam in de repo-root (bv. Cost-Forge-2.2-full.zip)"
+        required: false
+        default: "Cost-Forge-2.2-full.zip"
   push:
     paths:
-      - "*.zip"           # draait automatisch als je een zip pusht
+      - "*.zip"   # draait automatisch als je een ZIP pusht
+
+permissions:
+  contents: write
 
 jobs:
-  unzip:
+  unpack:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Find ZIP
+      - name: Locate ZIP
         id: z
         shell: bash
         run: |
           set -euo pipefail
-          ZIP="$(ls -1 *.zip 2>/dev/null | head -n1 || true)"
+          ZIP="${{ github.event.inputs.zip || '' }}"
           if [ -z "$ZIP" ]; then
-            echo "Geen zip gevonden in repo-root."
+            ZIP="$(ls -1 *.zip 2>/dev/null | head -n1 || true)"
+          fi
+          if [ -z "$ZIP" ] || [ ! -f "$ZIP" ]; then
+            echo "❌ Geen ZIP gevonden in de repo-root."
             exit 1
           fi
           echo "zip=$ZIP" >> "$GITHUB_OUTPUT"
-          echo "Gevonden: $ZIP"
+          echo "📦 ZIP: $ZIP"
 
-      - name: Unzip (quiet)
+      - name: Unzip into temp dir
         shell: bash
         run: |
           set -euo pipefail
+          rm -rf extracted
           unzip -q -o "${{ steps.z.outputs.zip }}" -d extracted
 
-      - name: Determine source folder (handles top-level directory in ZIP)
+      - name: Determine source folder
         id: src
         shell: bash
         run: |
           set -euo pipefail
-          # Als de zip één top-level map bevat, gebruik die, anders de hele 'extracted'
-          COUNT=$(find extracted -mindepth 1 -maxdepth 1 -type d | wc -l)
-          if [ "$COUNT" -eq 1 ] && [ -z "$(find extracted -mindepth 1 -maxdepth 1 -type f)" ]; then
-            SRC="$(find extracted -mindepth 1 -maxdepth 1 -type d | head -n1)"
+          DIRS=$(find extracted -mindepth 1 -maxdepth 1 -type d | wc -l)
+          FILES=$(find extracted -mindepth 1 -maxdepth 1 -type f | wc -l)
+          if [ "$DIRS" -eq 1 ] && [ "$FILES" -eq 0 ]; then
+            SRC="$(find extracted -mindepth 1 -maxdepth 1 -type d)"
           else
             SRC="extracted"
           fi
           echo "src=$SRC" >> "$GITHUB_OUTPUT"
-          echo "Source: $SRC"
+          echo "📁 Source: $SRC"
 
-      - name: Copy files safely with rsync (skip .github)
+      - name: Remove .git and .github from source (avoid conflicts)
         shell: bash
         run: |
           set -euo pipefail
-          sudo apt-get update -y >/dev/null
-          sudo apt-get install -y rsync >/dev/null
-          # Kopieer alles behalve .github/ zodat bestaande workflows niet overschreven worden
-          rsync -a --delete-excluded \
-            --exclude='.github/' \
-            "${{ steps.src.outputs.src }}/" ./
+          SRC="${{ steps.src.outputs.src }}"
+          # Verwijder .git en .github waar dan ook in de unzip-tree
+          find "$SRC" -type d -name ".git" -prune -exec rm -rf {} + || true
+          find "$SRC" -type d -name ".github" -prune -exec rm -rf {} + || true
+
+      - name: Copy contents to repo root (no mv)
+        shell: bash
+        run: |
+          set -euo pipefail
+          SRC="${{ steps.src.outputs.src }}"
+          # Kopieer ALLE inhoud incl. dotfiles via de '/.'-truc, zonder mv
+          cp -a "$SRC/." ./
+
+      - name: Cleanup temp and ZIP
+        shell: bash
+        run: |
+          set -euo pipefail
           rm -rf extracted
-
-      - name: Remove the processed ZIP (avoid re-trigger loops)
-        shell: bash
-        run: |
-          set -euo pipefail
-          git rm -f "${{ steps.z.outputs.zip }}" || rm -f "${{ steps.z.outputs.zip }}"
+          # verwijder de zip uit git (als hij al getrackt was) of gewoon lokaal
+          git rm -f "${{ steps.z.outputs.zip }}" 2>/dev/null || rm -f "${{ steps.z.outputs.zip }}"
 
       - name: Commit & push if changed
         shell: bash
@@ -78,7 +94,7 @@ jobs:
             git config user.name  "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add -A
-            git commit -m "chore: unzip '${{ steps.z.outputs.zip }}' into repo (skip .github)"
+            git commit -m "unpack: ${{ steps.z.outputs.zip }} → repo (skip .git/.github in zip, cp -a, no mv)"
             git push
             echo "✅ Uitgepakt en gecommit."
           else
