@@ -1,37 +1,86 @@
-name: Unzip and Commit (Safe)
+name: Unzip and Commit (First-Time-Right)
+
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - "*.zip"           # draait automatisch als je een zip pusht
 
 jobs:
   unzip:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Unzip file
+      - name: Find ZIP
+        id: z
+        shell: bash
         run: |
-          unzip -o Cost-Forge-2.2-full.zip -d extracted
-          rm Cost-Forge-2.2-full.zip
+          set -euo pipefail
+          ZIP="$(ls -1 *.zip 2>/dev/null | head -n1 || true)"
+          if [ -z "$ZIP" ]; then
+            echo "Geen zip gevonden in repo-root."
+            exit 1
+          fi
+          echo "zip=$ZIP" >> "$GITHUB_OUTPUT"
+          echo "Gevonden: $ZIP"
 
-      - name: Copy files except .github
+      - name: Unzip (quiet)
+        shell: bash
         run: |
-          shopt -s dotglob
-          for f in extracted/*; do
-            if [ "$(basename "$f")" = ".github" ]; then
-              echo "Skipping .github folder"
-            else
-              cp -r "$f" ./
-            fi
-          done
+          set -euo pipefail
+          unzip -q -o "${{ steps.z.outputs.zip }}" -d extracted
+
+      - name: Determine source folder (handles top-level directory in ZIP)
+        id: src
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Als de zip één top-level map bevat, gebruik die, anders de hele 'extracted'
+          COUNT=$(find extracted -mindepth 1 -maxdepth 1 -type d | wc -l)
+          if [ "$COUNT" -eq 1 ] && [ -z "$(find extracted -mindepth 1 -maxdepth 1 -type f)" ]; then
+            SRC="$(find extracted -mindepth 1 -maxdepth 1 -type d | head -n1)"
+          else
+            SRC="extracted"
+          fi
+          echo "src=$SRC" >> "$GITHUB_OUTPUT"
+          echo "Source: $SRC"
+
+      - name: Copy files safely with rsync (skip .github)
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -y >/dev/null
+          sudo apt-get install -y rsync >/dev/null
+          # Kopieer alles behalve .github/ zodat bestaande workflows niet overschreven worden
+          rsync -a --delete-excluded \
+            --exclude='.github/' \
+            "${{ steps.src.outputs.src }}/" ./
           rm -rf extracted
 
-      - name: Commit changes
+      - name: Remove the processed ZIP (avoid re-trigger loops)
+        shell: bash
         run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          git add .
-          git commit -m "Unzipped and committed contents (skip .github)"
-          git push
+          set -euo pipefail
+          git rm -f "${{ steps.z.outputs.zip }}" || rm -f "${{ steps.z.outputs.zip }}"
+
+      - name: Commit & push if changed
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -n "$(git status --porcelain)" ]; then
+            git config user.name  "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add -A
+            git commit -m "chore: unzip '${{ steps.z.outputs.zip }}' into repo (skip .github)"
+            git push
+            echo "✅ Uitgepakt en gecommit."
+          else
+            echo "ℹ️ Geen wijzigingen om te committen."
+          fi
