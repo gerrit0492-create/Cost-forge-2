@@ -1,0 +1,86 @@
+name: Smoke Test Cost Forge
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["Bootstrap Cost Forge Full"]
+    types: [completed]
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Quick import test
+        run: |
+          python - <<'PY'
+          import importlib, sys
+          modules = [
+            "utils.safe","utils.io","utils.pricing","utils.quotes",
+            "utils.docx_export","utils.pdf_export"
+          ]
+          ok, fail = [], []
+          for m in modules:
+            try:
+              importlib.import_module(m); ok.append(m)
+            except Exception as e:
+              fail.append((m, repr(e)))
+          print("OK:", ok)
+          if fail:
+            print("FAIL:", fail)
+            sys.exit(1)
+          PY
+
+      - name: Data sanity
+        run: |
+          python - <<'PY'
+          from utils.io import load_materials,load_processes,load_bom,load_quotes
+          dfs = {
+            "materials": load_materials(),
+            "processes": load_processes(),
+            "bom": load_bom(),
+            "quotes": load_quotes()
+          }
+          for k, df in dfs.items():
+            print(f"{k}: {len(df)} rows")
+          # Niet falen als een file leeg is; Bootstrap vult voorbeelddata in.
+          PY
+
+      - name: E2E compute + exports
+        run: |
+          mkdir -p artifacts
+          python - <<'PY'
+          from utils.io import load_materials,load_processes,load_bom,load_quotes
+          from utils.quotes import apply_best_quotes
+          from utils.pricing import compute_costs
+          from utils.docx_export import make_offer_docx
+          from utils.pdf_export import make_offer_pdf
+          mats=load_materials(); procs=load_processes(); bom=load_bom(); quotes=load_quotes()
+          df=compute_costs(apply_best_quotes(mats,quotes),procs,bom)
+          assert "total_cost" in df.columns and len(df)>=1, "Lege berekening of geen total_cost"
+          open("artifacts/offerte.docx","wb").write(make_offer_docx(df))
+          open("artifacts/offerte.pdf","wb").write(make_offer_pdf(df))
+          print("TOTAL:", float(df["total_cost"].sum()))
+          PY
+
+      - name: Upload artifacts (DOCX + PDF)
+        uses: actions/upload-artifact@v4
+        with:
+          name: offer-exports
+          path: artifacts/
