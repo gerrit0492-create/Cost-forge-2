@@ -1,9 +1,6 @@
-name: Unzip and Commit (Safe Copy)
+name: Unzip and Commit (Safe)
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - "Cost-Forge-2.2-full.zip"
 
 jobs:
   unzip:
@@ -19,14 +16,14 @@ jobs:
           unzip -o Cost-Forge-2.2-full.zip -d extracted
           rm Cost-Forge-2.2-full.zip
 
-      - name: Copy files (skip .github)
+      - name: Copy files except .github
         run: |
           shopt -s dotglob
           for f in extracted/*; do
             if [ "$(basename "$f")" = ".github" ]; then
-              echo "Skip .github folder"
+              echo "Skipping .github folder"
             else
-              cp -r "$f" .
+              cp -r "$f" ./
             fi
           done
           rm -rf extracted
