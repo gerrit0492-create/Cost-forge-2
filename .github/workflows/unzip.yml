@@ -1,0 +1,34 @@
+name: Unzip and Commit
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "Cost-Forge-2.2-full.zip"
+
+jobs:
+  unzip:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Unzip file
+        run: |
+          unzip -o Cost-Forge-2.2-full.zip -d extracted
+          rm Cost-Forge-2.2-full.zip
+
+      - name: Move files to root
+        run: |
+          shopt -s dotglob
+          mv extracted/* .
+          rm -rf extracted
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -m "Unzipped and committed contents"
+          git push
