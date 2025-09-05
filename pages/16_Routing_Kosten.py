@@ -1,7 +1,11 @@
-from utils.safe import guard
-import streamlit as st, pandas as pd
+import pandas as pd
+import streamlit as st
+
 from utils.io import load_bom
 from utils.routing import compute_routing_cost, routing_summary
+from utils.safe import guard
+
+
 def main():
     st.title("🛠️ Routing Kosten")
     st.write("Upload routing.csv met kolommen: process_id,time_h_per_unit,setup_h")
@@ -12,4 +16,6 @@ def main():
         st.dataframe(df)
         st.subheader("Samenvatting")
         st.dataframe(routing_summary(df))
+
+
 guard(main)
