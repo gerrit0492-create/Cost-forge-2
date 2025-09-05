@@ -544,3 +544,70 @@ jobs:
         with:
           name: offer-exports
           path: artifacts/
+  regression:
+    needs: smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Guardrails: business rules must hold
+        run: |
+          python - <<'PY'
+          import sys
+          import pandas as pd
+          from utils.io import load_materials, load_processes, load_bom
+          from utils.validators import business_rules, summarize_rules, all_rules_ok
+
+          mats = load_materials(); procs = load_processes(); bom = load_bom()
+          rules = business_rules(mats, procs, bom)
+          print(summarize_rules(rules))
+          if not all_rules_ok(rules):
+              sys.exit(1)
+          PY
+
+      - name: Regression: scenario sanity
+        run: |
+          python - <<'PY'
+          import math
+          from utils.io import load_materials, load_processes, load_bom, load_quotes
+          from utils.quotes import apply_best_quotes
+          from utils.pricing import compute_costs
+
+          mats = load_materials(); procs = load_processes(); bom = load_bom(); quotes = load_quotes()
+          base = compute_costs(apply_best_quotes(mats, quotes), procs, bom)["total_cost"].sum()
+
+          # Scenario’s
+          mats_up = mats.copy(); mats_up["price_eur_per_kg"] *= 1.10
+          s1 = compute_costs(apply_best_quotes(mats_up, quotes), procs, bom)["total_cost"].sum()
+
+          procs_up = procs.copy(); procs_up["labor_rate_eur_h"] *= 1.15
+          s2 = compute_costs(apply_best_quotes(mats, quotes), procs_up, bom)["total_cost"].sum()
+
+          procs_m = procs.copy(); procs_m["margin_pct"] = procs_m["margin_pct"] + 0.05
+          s3 = compute_costs(apply_best_quotes(mats, quotes), procs_m, bom)["total_cost"].sum()
+
+          def gt(a,b): return (a - b) > 1e-6
+
+          ok = True
+          if not gt(s1, base): print("[FAIL] +10% materiaal verhoogt totaal NIET."); ok = False
+          if not gt(s2, base): print("[FAIL] +15% loon verhoogt totaal NIET."); ok = False
+          if not gt(s3, base): print("[FAIL] +5pp marge verhoogt totaal NIET."); ok = False
+
+          print("BASE:", base, "S1:", s1, "S2:", s2, "S3:", s3)
+          if not ok: raise SystemExit(1)
+          PY
