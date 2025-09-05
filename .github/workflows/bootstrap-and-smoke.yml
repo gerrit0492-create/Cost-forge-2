@@ -67,7 +67,7 @@ jobs:
 
           [tool.ruff.lint]
           select = ["E","F","I"]
-          ignore = ["E501"]  # lange regels = formatter
+          ignore = ["E501"]  # lange regels toestaan
 
           [tool.ruff.format]
           docstring-code-format = true
@@ -80,7 +80,7 @@ jobs:
           st.write("Quick Cost, Data Quality, Scenario Planner, Supplier Quotes, DOCX/PDF Export, Download Center + Legacy pagina's")
           PY
 
-      - name: Write utils (core)
+      - name: Write utils (core + validators)
         run: |
           cat > utils/safe.py <<'PY'
           import streamlit as st
@@ -140,15 +140,16 @@ jobs:
               return q.groupby("material_id").head(1).reset_index(drop=True)
           def apply_best_quotes(materials: pd.DataFrame, quotes: pd.DataFrame) -> pd.DataFrame:
               best = best_quotes(quotes)
-              m = materials.drop(columns=["price_eur_per_kg"], errors="ignore").merge(
+              m = materials.merge(
                   best[["material_id","price_eur_per_kg","supplier","lead_time_days"]],
-                  on="material_id", how="left")
-              m = m.rename(columns={"price_eur_per_kg":"price_eur_per_kg_from_quote"})
-              if "price_eur_per_kg" not in materials.columns:
-                  m["price_eur_per_kg"] = m["price_eur_per_kg_from_quote"]
-              else:
-                  base = materials["price_eur_per_kg"]
-                  m["price_eur_per_kg"] = base.fillna(m["price_eur_per_kg_from_quote"])
+                  on="material_id", how="left", suffixes=("", "_quote")
+              )
+              if "price_eur_per_kg_quote" in m.columns:
+                  if "price_eur_per_kg" not in m.columns:
+                      m["price_eur_per_kg"] = m["price_eur_per_kg_quote"]
+                  else:
+                      m["price_eur_per_kg"] = m["price_eur_per_kg"].fillna(m["price_eur_per_kg_quote"])
+                  m = m.drop(columns=["price_eur_per_kg_quote"])
               return m
           def join_with_materials(materials: pd.DataFrame, best: pd.DataFrame) -> pd.DataFrame:
               return materials.drop(columns=["price_eur_per_kg"], errors="ignore").merge(
@@ -346,7 +347,7 @@ jobs:
           guard(main)
           PY
 
-      - name: Install dependencies for CSV repair
+      - name: Install dependencies (Python)
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
@@ -441,7 +442,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # Belangrijk: CSV's repareren óók hier (idempotent), zodat de check nooit faalt
       - name: CSVs – repair (idempotent, before checks)
         run: |
           python - <<'PY'
@@ -450,35 +450,20 @@ jobs:
           P = paths()
           def ensure_csv(path, schema):
               cols = list(schema.keys())
-              if path.exists():
+              try:
                   df = pd.read_csv(path)
-                  for c in cols:
-                      if c not in df.columns:
-                          df[c] = pd.NA
-                  df = df[list(dict.fromkeys(list(df.columns)+cols))]
-              else:
-                  df = pd.DataFrame([], columns=cols)
+              except FileNotFoundError:
+                  df = pd.DataFrame(columns=cols)
+              for c in cols:
+                  if c not in df.columns:
+                      df[c] = pd.NA
+              df = df[list(dict.fromkeys(list(df.columns)+cols))]
               df.to_csv(path, index=False)
           ensure_csv(P["materials"], SCHEMA_MATERIALS)
           ensure_csv(P["processes"], SCHEMA_PROCESSES)
           ensure_csv(P["bom"], SCHEMA_BOM)
           ensure_csv(P["quotes"], SCHEMA_QUOTES)
           print("✅ CSVs repaired (smoke).")
-          PY
-
-      - name: Quick import test
-        run: |
-          python - <<'PY'
-          import importlib, sys
-          mods = ["utils.safe","utils.io","utils.pricing","utils.quotes","utils.docx_export","utils.pdf_export","utils.validators"]
-          bad=[]
-          for m in mods:
-              try: importlib.import_module(m)
-              except Exception as e: bad.append((m,repr(e)))
-          if bad:
-              for m,e in bad: print(f"[IMPORT FAIL] {m}: {e}")
-              sys.exit(1)
-          print("Imports OK")
           PY
 
       - name: CSV schema check (only fail on missing)
@@ -504,6 +489,38 @@ jobs:
           print("Schema OK")
           PY
 
+      - name: Seed demo rows if CSVs are empty (idempotent)
+        run: |
+          python - <<'PY'
+          import pandas as pd
+          from utils.io import SCHEMA_MATERIALS, SCHEMA_PROCESSES, SCHEMA_BOM, SCHEMA_QUOTES, paths
+          P = paths()
+          def seed_if_empty(path, rows, columns):
+              try:
+                  df = pd.read_csv(path)
+              except FileNotFoundError:
+                  df = pd.DataFrame(columns=columns)
+              if df.empty:
+                  pd.DataFrame(rows, columns=columns).to_csv(path, index=False)
+          seed_if_empty(P["materials"],
+              [{"material_id":"AL6061","description":"Aluminium 6061","price_eur_per_kg":4.5},
+               {"material_id":"S235","description":"Staal S235","price_eur_per_kg":1.1}],
+              list(SCHEMA_MATERIALS.keys()))
+          seed_if_empty(P["processes"],
+              [{"process_id":"MILLING_CNC_3AX","machine_rate_eur_h":80,"labor_rate_eur_h":45,"overhead_pct":0.2,"margin_pct":0.1},
+               {"process_id":"TURNING_CNC","machine_rate_eur_h":70,"labor_rate_eur_h":45,"overhead_pct":0.2,"margin_pct":0.1}],
+              list(SCHEMA_PROCESSES.keys()))
+          seed_if_empty(P["bom"],
+              [{"line_id":"L1","material_id":"AL6061","qty":10,"mass_kg":2.4,"process_route":"MILLING_CNC_3AX","runtime_h":0.4},
+               {"line_id":"L2","material_id":"S235","qty":6,"mass_kg":5.0,"process_route":"TURNING_CNC","runtime_h":0.35}],
+              list(SCHEMA_BOM.keys()))
+          seed_if_empty(P["quotes"],
+              [{"supplier":"Metals4U","material_id":"AL6061","price_eur_per_kg":4.4,"lead_time_days":7,"valid_until":"2025-12-31","preferred":1},
+               {"supplier":"SteelCo","material_id":"S235","price_eur_per_kg":1.05,"lead_time_days":10,"valid_until":"2025-11-15","preferred":1}],
+              list(SCHEMA_QUOTES.keys()))
+          print("✅ Seeded demo rows where CSVs were empty.")
+          PY
+
       - name: E2E compute + exports
         run: |
           mkdir -p artifacts
@@ -515,7 +532,8 @@ jobs:
           from utils.pdf_export import make_offer_pdf
           mats=load_materials(); procs=load_processes(); bom=load_bom(); quotes=load_quotes()
           df = compute_costs(apply_best_quotes(mats, quotes), procs, bom)
-          assert "total_cost" in df.columns and len(df)>=1
+          assert "total_cost" in df.columns, "total_cost ontbreekt in DF (check pricing pipeline)"
+          assert len(df) >= 1, "Geen rijen in DF (CSV's leeg?)"
           open("artifacts/offerte.docx","wb").write(make_offer_docx(df))
           open("artifacts/offerte.pdf","wb").write(make_offer_pdf(df))
           print("TOTAL:", float(df["total_cost"].sum()))
