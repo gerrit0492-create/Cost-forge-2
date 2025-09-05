@@ -1,9 +1,12 @@
 # pages/99_Update_from_Public_CSV.py
 from pathlib import Path
 from urllib.parse import urlparse
-import streamlit as st
+
 import pandas as pd
+import streamlit as st
+
 from utils.safe import guard
+
 
 def edit_url_to_csv(edit_url: str, gid: str | int = 0) -> str:
     # werkt voor edit/view URL's → export CSV
@@ -15,25 +18,39 @@ def edit_url_to_csv(edit_url: str, gid: str | int = 0) -> str:
     sheet_id = seg[2]
     return f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv&gid={gid}"
 
+
 def read_public_csv(csv_url: str) -> pd.DataFrame:
     df = pd.read_csv(csv_url)
     # vaak handige casts
-    for c in ["price_eur_per_kg","machine_rate_eur_h","labor_rate_eur_h","overhead_pct","margin_pct","qty","mass_kg","runtime_h","lead_time_days"]:
+    for c in [
+        "price_eur_per_kg",
+        "machine_rate_eur_h",
+        "labor_rate_eur_h",
+        "overhead_pct",
+        "margin_pct",
+        "qty",
+        "mass_kg",
+        "runtime_h",
+        "lead_time_days",
+    ]:
         if c in df.columns:
             df[c] = pd.to_numeric(df[c], errors="coerce")
     if "date" in df.columns:
         df["date"] = pd.to_datetime(df["date"], errors="coerce")
     return df
 
+
 def write_and_snapshot(df: pd.DataFrame, target: Path, history_prefix: str):
     target.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(target, index=False)
-    hist_dir = Path("data/history"); hist_dir.mkdir(parents=True, exist_ok=True)
+    hist_dir = Path("data/history")
+    hist_dir.mkdir(parents=True, exist_ok=True)
     stamp = pd.Timestamp.utcnow().strftime("%Y%m%d")
     snap = hist_dir / f"{history_prefix}{stamp}.csv"
     if not snap.exists():
         df.to_csv(snap, index=False)
     return target, snap
+
 
 def main():
     st.title("🔗 Google Sheet (edit URL) → CSV import + snapshot")
@@ -41,7 +58,11 @@ def main():
     edit_url = st.text_input("Plak je Google Sheets *edit* URL hier", value="")
     gid = st.text_input("gid (tabblad-ID)", value="0", help="Meestal 0 = eerste tab.")
 
-    t = st.radio("Waar wil je dit voor gebruiken?", ["Materials", "Processes", "Quotes", "BOM"], horizontal=True)
+    t = st.radio(
+        "Waar wil je dit voor gebruiken?",
+        ["Materials", "Processes", "Quotes", "BOM"],
+        horizontal=True,
+    )
     mapping = {
         "Materials": ("data/materials_db.csv", "materials_"),
         "Processes": ("data/processes_db.csv", "processes_"),
@@ -70,8 +91,13 @@ def main():
             path, snap = write_and_snapshot(df, Path(target_path), prefix)
             st.success(f"Opgeslagen → {path}")
             st.info(f"Snapshot → {snap.name}")
-            st.download_button("Download CSV", path.read_bytes(), file_name=Path(target_path).name, mime="text/csv")
+            st.download_button(
+                "Download CSV", path.read_bytes(), file_name=Path(target_path).name, mime="text/csv"
+            )
             if snap.exists():
-                st.download_button("Download snapshot", snap.read_bytes(), file_name=snap.name, mime="text/csv")
+                st.download_button(
+                    "Download snapshot", snap.read_bytes(), file_name=snap.name, mime="text/csv"
+                )
+
 
 guard(main)
