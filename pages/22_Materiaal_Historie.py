@@ -1,15 +1,13 @@
-from utils.safe import guard
+import streamlit as st
+
 from utils.history import (
-    load_materials,
-    save_snapshot_current,
-    build_history_df,
-    get_price_series,
     diff_vs_latest,
     find_anomalies,
+    get_price_series,
+    load_materials,
+    save_snapshot_current,
 )
-
-import pandas as pd
-import streamlit as st
+from utils.safe import guard
 
 
 def main():
@@ -38,8 +36,9 @@ def main():
             if len(anomalies):
                 with st.expander("Toon afwijkingen vs. laatste snapshot"):
                     st.dataframe(
-                        anomalies[["material_id", "old_price", "new_price", "pct_change"]]
-                        .sort_values("pct_change"),
+                        anomalies[
+                            ["material_id", "old_price", "new_price", "pct_change"]
+                        ].sort_values("pct_change"),
                         use_container_width=True,
                     )
 
