@@ -14,17 +14,17 @@ def best_quotes(quotes: pd.DataFrame) -> pd.DataFrame:
 
 def apply_best_quotes(materials: pd.DataFrame, quotes: pd.DataFrame) -> pd.DataFrame:
     best = best_quotes(quotes)
-    m = materials.copy()
-    m = m.drop(columns=["price_eur_per_kg"], errors="ignore").merge(
+    m = materials.drop(columns=["price_eur_per_kg"], errors="ignore").merge(
         best[["material_id", "price_eur_per_kg", "supplier", "lead_time_days"]],
         on="material_id",
         how="left",
     )
     m = m.rename(columns={"price_eur_per_kg": "price_eur_per_kg_from_quote"})
-    if "price_eur_per_kg" not in m.columns:
+    if "price_eur_per_kg" not in materials.columns:
         m["price_eur_per_kg"] = m["price_eur_per_kg_from_quote"]
     else:
-        m["price_eur_per_kg"] = m["price_eur_per_kg"].fillna(m["price_eur_per_kg_from_quote"])
+        base = materials["price_eur_per_kg"]
+        m["price_eur_per_kg"] = base.fillna(m["price_eur_per_kg_from_quote"])
     return m
 
 

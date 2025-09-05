@@ -2,11 +2,7 @@ from pathlib import Path
 
 import pandas as pd
 
-SCHEMA_MATERIALS = {
-    "material_id": "string",
-    "description": "string",
-    "price_eur_per_kg": "float64",
-}
+SCHEMA_MATERIALS = {"material_id": "string", "description": "string", "price_eur_per_kg": "float64"}
 SCHEMA_PROCESSES = {
     "process_id": "string",
     "machine_rate_eur_h": "float64",

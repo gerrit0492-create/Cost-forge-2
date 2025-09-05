@@ -2,4 +2,9 @@
 - Quick Cost (beste quotes), Data Quality, Scenario Planner
 - Supplier Quotes, DOCX/PDF export, Download Center
 - Legacy pagina's (compat wrappers)
-Start: `home.py`
+
+Lokaal starten:
+```bash
+pip install -r requirements.txt
+streamlit run home.py
+```
