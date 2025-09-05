@@ -1,5 +1,5 @@
 # Cost Forge 2.2 — First-Time-Right
-
+![Smoke Test](https://github.com/gerrit0492-create/Cost-tool-pages/actions/workflows/smoke-test.yml/badge.svg)
 Alles om meteen te draaien:
 - **Quick Cost** met automatische supplier quotes
 - **Scenario Planner**
