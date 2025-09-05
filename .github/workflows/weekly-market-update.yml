@@ -1,9 +1,9 @@
-name: Weekly Market Update
+name: "Weekly Market Update (quotes + commodity + sheet + history)"
 
 on:
   schedule:
     - cron: "0 5 * * 1"   # elke maandag 05:00 UTC
-  workflow_dispatch:      # handmatig starten
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -12,38 +12,42 @@ jobs:
   update:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    env:
+      # Optioneel: zet deze in repo → Settings → Secrets and variables → Actions → New repository secret
+      # Naam: MARKET_FACTORS_URL, Value: je Google Sheet CSV export link
+      MARKET_FACTORS_URL: ${{ secrets.MARKET_FACTORS_URL }}
 
     steps:
-      - name: Checkout
+      - name: "Checkout"
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Setup Python
+      - name: "Setup Python"
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
           cache: "pip"
 
-      - name: Install deps (pandas only)
+      - name: "Install pandas"
         run: |
           python -m pip install --upgrade pip
           pip install pandas
 
-      - name: Run market update
+      - name: "Run market update"
         run: |
           python tools/update_materials_from_market.py
 
-      - name: Commit & push (only if changed)
+      - name: "Commit & push (materials + history if changed)"
         shell: bash
         run: |
           set -e
           if [ -n "$(git status --porcelain)" ]; then
             git config user.name  "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add data/materials_db.csv
-            git commit -m "chore: weekly market update (materials_db.csv)"
-            # push naar main of fallback branch als main protected is
+            git add data/materials_db.csv || true
+            git add data/history/*.csv || true
+            git commit -m "chore: weekly market update (materials + history snapshots)"
             if git push origin HEAD:main; then
               echo "Pushed to main."
             else
@@ -56,3 +60,11 @@ jobs:
           else
             echo "No changes to commit."
           fi
+
+      - name: "Upload history snapshots (artifact)"
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: materials-history
+          path: data/history/
+          if-no-files-found: ignore
