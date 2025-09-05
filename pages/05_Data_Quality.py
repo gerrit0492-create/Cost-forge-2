@@ -1,7 +1,8 @@
-from utils.safe import guard
-from utils.io import load_bom, load_materials, load_processes
-from utils.validators import check_missing, check_positive
 import streamlit as st
+
+from utils.io import load_bom, load_materials, load_processes
+from utils.safe import guard
+from utils.validators import check_missing, check_positive
 
 
 def main():
@@ -17,9 +18,13 @@ def main():
         procs,
         ["process_id", "machine_rate_eur_h", "labor_rate_eur_h", "overhead_pct", "margin_pct"],
     )
-    p2 = check_positive(procs, ["machine_rate_eur_h", "labor_rate_eur_h", "overhead_pct", "margin_pct"])
+    p2 = check_positive(
+        procs, ["machine_rate_eur_h", "labor_rate_eur_h", "overhead_pct", "margin_pct"]
+    )
 
-    b1 = check_missing(bom, ["line_id", "material_id", "qty", "mass_kg", "process_route", "runtime_h"])
+    b1 = check_missing(
+        bom, ["line_id", "material_id", "qty", "mass_kg", "process_route", "runtime_h"]
+    )
     b2 = check_positive(bom, ["qty", "mass_kg", "runtime_h"])
 
     any_issue = any([m1, m2, p1, p2, b1, b2])

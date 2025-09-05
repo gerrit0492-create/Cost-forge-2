@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import Iterable, List, Mapping
+
 import pandas as pd
 
 
@@ -21,32 +22,19 @@ def check_positive(df: pd.DataFrame, cols: Iterable[str]) -> List[str]:
 
 
 def validate_all(
-    mats: pd.DataFrame,
-    procs: pd.DataFrame,
-    bom: pd.DataFrame,
+    mats: pd.DataFrame, procs: pd.DataFrame, bom: pd.DataFrame
 ) -> Mapping[str, Mapping[str, list]]:
     report = {
         "materials": {"missing": [], "negative": []},
         "processes": {"missing": [], "negative": []},
         "bom": {"missing": [], "negative": []},
     }
-
-    report["materials"]["missing"] += check_missing(
-        mats, ["material_id", "price_eur_per_kg"]
-    )
-    report["materials"]["negative"] += check_positive(
-        mats, ["price_eur_per_kg"]
-    )
+    report["materials"]["missing"] += check_missing(mats, ["material_id", "price_eur_per_kg"])
+    report["materials"]["negative"] += check_positive(mats, ["price_eur_per_kg"])
 
     report["processes"]["missing"] += check_missing(
         procs,
-        [
-            "process_id",
-            "machine_rate_eur_h",
-            "labor_rate_eur_h",
-            "overhead_pct",
-            "margin_pct",
-        ],
+        ["process_id", "machine_rate_eur_h", "labor_rate_eur_h", "overhead_pct", "margin_pct"],
     )
     report["processes"]["negative"] += check_positive(
         procs,
@@ -56,8 +44,5 @@ def validate_all(
     report["bom"]["missing"] += check_missing(
         bom, ["line_id", "material_id", "qty", "mass_kg", "process_route", "runtime_h"]
     )
-    report["bom"]["negative"] += check_positive(
-        bom, ["qty", "mass_kg", "runtime_h"]
-    )
-
+    report["bom"]["negative"] += check_positive(bom, ["qty", "mass_kg", "runtime_h"])
     return report
