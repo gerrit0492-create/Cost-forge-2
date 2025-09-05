@@ -1,0 +1,56 @@
+name: Nightly Material Snapshot
+
+on:
+  schedule:
+    - cron: "5 2 * * *"   # elke nacht 02:05 UTC
+  workflow_dispatch:       # handmatig starten kan ook
+
+permissions:
+  contents: write
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create daily snapshot file
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p data/history
+          SNAP="data/history/materials_$(date -u +%Y%m%d).csv"
+          if [[ -f "$SNAP" ]]; then
+            echo "✅ Snapshot voor vandaag bestaat al: $SNAP"
+          else
+            if [[ ! -f "data/materials_db.csv" ]]; then
+              echo "❌ data/materials_db.csv ontbreekt"; exit 1
+            fi
+            cp "data/materials_db.csv" "$SNAP"
+            echo "📸 Aangemaakt: $SNAP"
+          fi
+
+      - name: Commit & push (fallback naar branch als main beschermd is)
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add -A
+          if git diff --cached --quiet; then
+            echo "ℹ️ Geen wijzigingen om te committen."
+            exit 0
+          fi
+          git -c user.name="github-actions[bot]" \
+              -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+              commit -m "chore: nightly materials snapshot"
+          if git push origin HEAD:main; then
+            echo "✅ Snapshot gecommit naar main."
+          else
+            BR="bot/snapshot-$(date -u +%Y%m%d-%H%M%S)"
+            git switch -c "$BR"
+            git push -u origin "$BR"
+            echo "::notice title=Open Pull Request::https://github.com/${GITHUB_REPOSITORY}/compare/${BR}?expand=1"
+          fi
