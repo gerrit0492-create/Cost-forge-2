@@ -1,14 +1,26 @@
-name: "Panic Button: Restore materials_db.csv from history"
+name: "Panic Button: Restore materials_db.csv (guardrails)"
 
 on:
   workflow_dispatch:
     inputs:
       snapshot:
-        description: 'Snapshot kiezen: "latest", "YYYYMMDD" of bestandsnaam (materials_YYYYMMDD.csv)'
+        description: 'Snapshot: "latest", "YYYYMMDD" of bestandsnaam (materials_YYYYMMDD.csv)'
         required: false
         default: "latest"
       dry_run:
-        description: "Toon diff zonder te schrijven (true/false)"
+        description: "Alleen diff tonen? (true/false)"
+        required: false
+        default: "false"
+      threshold_pct:
+        description: "Drempel als fractie (0.40 = 40%)"
+        required: false
+        default: "0.40"
+      min_anomalies:
+        description: "Min. aantal hits boven drempel om te blokkeren"
+        required: false
+        default: "10"
+      force:
+        description: "Forceer ondanks anomaliën? (true/false)"
         required: false
         default: "false"
 
@@ -23,8 +35,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+        with: { fetch-depth: 0 }
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -37,10 +48,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install pandas
 
-      - name: Run restore (dry-run or apply)
+      - name: Run restore (guardrails)
         env:
-          SNAPSHOT: ${{ github.event.inputs.snapshot }}
-          DRY_RUN:  ${{ github.event.inputs.dry_run }}
+          SNAPSHOT:      ${{ github.event.inputs.snapshot }}
+          DRY_RUN:       ${{ github.event.inputs.dry_run }}
+          THRESHOLD_PCT: ${{ github.event.inputs.threshold_pct }}
+          MIN_ANOMALIES: ${{ github.event.inputs.min_anomalies }}
+          FORCE:         ${{ github.event.inputs.force }}
         run: |
           python tools/restore_materials_from_history.py
 
@@ -52,8 +66,11 @@ jobs:
           if [ -n "$(git status --porcelain)" ]; then
             git config user.name  "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add data/materials_db.csv
-            git commit -m "revert(materials): restore from history (${{ github.event.inputs.snapshot }})"
+            git add data/materials_db.csv || true
+            git add data/history/*.csv || true
+            git commit -m "restore(materials): ${{
+              github.event.inputs.snapshot
+            }} (thr=${{ github.event.inputs.threshold_pct }}, min=${{ github.event.inputs.min_anomalies }}, force=${{ github.event.inputs.force }})"
             if git push origin HEAD:main; then
               echo "Pushed to main."
             else
@@ -67,11 +84,11 @@ jobs:
             echo "No changes to commit."
           fi
 
-      - name: Upload restored materials + snapshot (artifact)
+      - name: Upload artifacts (materials + history)
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: restored-materials
+          name: restore-output
           path: |
             data/materials_db.csv
             data/history/
