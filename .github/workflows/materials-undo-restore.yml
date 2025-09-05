@@ -1,0 +1,78 @@
+name: "Panic Button: Restore materials_db.csv from history"
+
+on:
+  workflow_dispatch:
+    inputs:
+      snapshot:
+        description: 'Snapshot kiezen: "latest", "YYYYMMDD" of bestandsnaam (materials_YYYYMMDD.csv)'
+        required: false
+        default: "latest"
+      dry_run:
+        description: "Toon diff zonder te schrijven (true/false)"
+        required: false
+        default: "false"
+
+permissions:
+  contents: write
+
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install pandas
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas
+
+      - name: Run restore (dry-run or apply)
+        env:
+          SNAPSHOT: ${{ github.event.inputs.snapshot }}
+          DRY_RUN:  ${{ github.event.inputs.dry_run }}
+        run: |
+          python tools/restore_materials_from_history.py
+
+      - name: Commit & push (if changed and not dry-run)
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        shell: bash
+        run: |
+          set -e
+          if [ -n "$(git status --porcelain)" ]; then
+            git config user.name  "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add data/materials_db.csv
+            git commit -m "revert(materials): restore from history (${{ github.event.inputs.snapshot }})"
+            if git push origin HEAD:main; then
+              echo "Pushed to main."
+            else
+              TS=$(date +%Y%m%d-%H%M%S)
+              BR="restore/${TS}"
+              git switch -c "$BR"
+              git push -u origin "$BR"
+              echo "::notice title=Open Pull Request::https://github.com/${GITHUB_REPOSITORY}/compare/${BR}?expand=1"
+            fi
+          else
+            echo "No changes to commit."
+          fi
+
+      - name: Upload restored materials + snapshot (artifact)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: restored-materials
+          path: |
+            data/materials_db.csv
+            data/history/
+          if-no-files-found: warn
