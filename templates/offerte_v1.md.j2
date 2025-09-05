@@ -1,0 +1,5 @@
+# Offerte {{ project_name }}
+**Totaal (EUR):** {{ total | round(2) }}
+{% for r in rows %}
+- {{ r.line_id }} — {{ r.material_id }} — € {{ r.total_cost | round(2) }}
+{% endfor %}
