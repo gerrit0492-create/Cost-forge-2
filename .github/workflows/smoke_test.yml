@@ -2,7 +2,7 @@ name: Smoke Test Cost Forge
 on:
   workflow_dispatch:
   workflow_run:
-    workflows: ["Bootstrap Cost Forge Full"]
+    workflows: ["Bootstrap Cost Forge Full + Legacy"]
     types: [completed]
 
 permissions:
@@ -29,10 +29,10 @@ jobs:
           pip install ruff
 
       # ---- Mini-lint (ruff) ---------------------------------------------------
-      - name: Ruff lint (no autofix, fail on serious issues)
+      - name: Ruff lint (no autofix, fail on real issues)
         run: |
           ruff --version
-          # beperk tot onze mappen; exit code 1 indien fouten
+          # beperk tot onze codepaden; exit 1 bij fouten
           ruff check utils pages home.py --output-format=github
 
       # ---- Quick import test --------------------------------------------------
@@ -58,11 +58,10 @@ jobs:
           PY
 
       # ---- CSV schema check ---------------------------------------------------
-      - name: CSV schema check (strict columns + dtypes baseline)
+      - name: CSV schema check (strict required columns)
         run: |
           python - <<'PY'
-          import sys
-          import pandas as pd
+          import sys, pandas as pd
           from utils.io import (
             SCHEMA_MATERIALS, SCHEMA_PROCESSES, SCHEMA_BOM, SCHEMA_QUOTES,
             load_materials, load_processes, load_bom, load_quotes
@@ -74,8 +73,8 @@ jobs:
             if missing:
               print(f"[SCHEMA] {name}: ontbrekende kolommen: {missing}")
             if extra:
-              print(f"[SCHEMA] {name}: extra kolommen: {extra}")
-            return not missing  # extra is waarschuwing, missing is error
+              print(f"[SCHEMA] {name}: extra kolommen (oké, waarschuwing): {extra}")
+            return not missing
 
           ok = True
           mats = load_materials()
@@ -88,7 +87,7 @@ jobs:
           ok &= check(bom, SCHEMA_BOM, "bom_template.csv")
           ok &= check(quotes, SCHEMA_QUOTES, "supplier_quotes.csv")
 
-          # snelle sanity: geen negatieve kosten-gerelateerde velden
+          # sanity: geen negatieve kernvelden → warning
           def any_negative(df, cols):
             bad=[c for c in cols if c in df.columns and (pd.to_numeric(df[c], errors="coerce") < 0).any()]
             return bad
@@ -99,12 +98,11 @@ jobs:
           neg += [f"bom:{c}" for c in any_negative(bom, ["qty","mass_kg","runtime_h"])]
 
           if neg:
-            print(f"[DATA] Negatieve waarden gedetecteerd in: {neg}")
-            # negatief is waarschuwing, niet direct fatal
+            print(f"[DATA] Negatieve waarden (waarschuwing): {neg}")
 
           if not ok:
             sys.exit(1)
-          print("Schema check OK (geen ontbrekende kolommen).")
+          print("Schema check OK (alle verplichte kolommen aanwezig).")
           PY
 
       # ---- E2E compute + exports ---------------------------------------------
