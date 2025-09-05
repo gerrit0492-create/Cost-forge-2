@@ -1,1 +1,133 @@
+name: Smoke Test Cost Forge
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["Bootstrap Cost Forge Full"]
+    types: [completed]
 
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install ruff
+
+      # ---- Mini-lint (ruff) ---------------------------------------------------
+      - name: Ruff lint (no autofix, fail on serious issues)
+        run: |
+          ruff --version
+          # beperk tot onze mappen; exit code 1 indien fouten
+          ruff check utils pages home.py --output-format=github
+
+      # ---- Quick import test --------------------------------------------------
+      - name: Quick import test
+        run: |
+          python - <<'PY'
+          import importlib, sys
+          modules = [
+            "utils.safe","utils.io","utils.pricing","utils.quotes",
+            "utils.docx_export","utils.pdf_export"
+          ]
+          bad=[]
+          for m in modules:
+            try:
+              importlib.import_module(m)
+            except Exception as e:
+              bad.append((m, repr(e)))
+          if bad:
+            for m,e in bad:
+              print(f"[IMPORT FAIL] {m}: {e}")
+            sys.exit(1)
+          print("All core imports OK")
+          PY
+
+      # ---- CSV schema check ---------------------------------------------------
+      - name: CSV schema check (strict columns + dtypes baseline)
+        run: |
+          python - <<'PY'
+          import sys
+          import pandas as pd
+          from utils.io import (
+            SCHEMA_MATERIALS, SCHEMA_PROCESSES, SCHEMA_BOM, SCHEMA_QUOTES,
+            load_materials, load_processes, load_bom, load_quotes
+          )
+
+          def check(df, schema, name):
+            missing = [c for c in schema.keys() if c not in df.columns]
+            extra   = [c for c in df.columns if c not in schema.keys()]
+            if missing:
+              print(f"[SCHEMA] {name}: ontbrekende kolommen: {missing}")
+            if extra:
+              print(f"[SCHEMA] {name}: extra kolommen: {extra}")
+            return not missing  # extra is waarschuwing, missing is error
+
+          ok = True
+          mats = load_materials()
+          procs = load_processes()
+          bom = load_bom()
+          quotes = load_quotes()
+
+          ok &= check(mats, SCHEMA_MATERIALS, "materials_db.csv")
+          ok &= check(procs, SCHEMA_PROCESSES, "processes_db.csv")
+          ok &= check(bom, SCHEMA_BOM, "bom_template.csv")
+          ok &= check(quotes, SCHEMA_QUOTES, "supplier_quotes.csv")
+
+          # snelle sanity: geen negatieve kosten-gerelateerde velden
+          def any_negative(df, cols):
+            bad=[c for c in cols if c in df.columns and (pd.to_numeric(df[c], errors="coerce") < 0).any()]
+            return bad
+
+          neg = []
+          neg += [f"materials:{c}" for c in any_negative(mats, ["price_eur_per_kg"])]
+          neg += [f"processes:{c}" for c in any_negative(procs, ["machine_rate_eur_h","labor_rate_eur_h","overhead_pct","margin_pct"])]
+          neg += [f"bom:{c}" for c in any_negative(bom, ["qty","mass_kg","runtime_h"])]
+
+          if neg:
+            print(f"[DATA] Negatieve waarden gedetecteerd in: {neg}")
+            # negatief is waarschuwing, niet direct fatal
+
+          if not ok:
+            sys.exit(1)
+          print("Schema check OK (geen ontbrekende kolommen).")
+          PY
+
+      # ---- E2E compute + exports ---------------------------------------------
+      - name: E2E compute + exports
+        run: |
+          mkdir -p artifacts
+          python - <<'PY'
+          from utils.io import load_materials,load_processes,load_bom,load_quotes
+          from utils.quotes import apply_best_quotes
+          from utils.pricing import compute_costs
+          from utils.docx_export import make_offer_docx
+          from utils.pdf_export import make_offer_pdf
+
+          mats=load_materials(); procs=load_processes(); bom=load_bom(); quotes=load_quotes()
+          df=compute_costs(apply_best_quotes(mats,quotes),procs,bom)
+          assert "total_cost" in df.columns and len(df)>=1, "Lege berekening of geen total_cost"
+          open("artifacts/offerte.docx","wb").write(make_offer_docx(df))
+          open("artifacts/offerte.pdf","wb").write(make_offer_pdf(df))
+          print("TOTAL:", float(df["total_cost"].sum()))
+          PY
+
+      - name: Upload artifacts (DOCX + PDF)
+        uses: actions/upload-artifact@v4
+        with:
+          name: offer-exports
+          path: artifacts/
