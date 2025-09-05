@@ -1,7 +1,9 @@
-from utils.safe import guard
-from utils.history import load_materials_history
-import streamlit as st
 import pandas as pd
+import streamlit as st
+
+from utils.history import load_materials_history
+from utils.safe import guard
+
 
 def main():
     st.title("⏳ Materiaalprijs Historie")
@@ -20,5 +22,6 @@ def main():
         st.line_chart(chart_df["price_eur_per_kg"])
     except Exception:
         pass
+
 
 guard(main)
