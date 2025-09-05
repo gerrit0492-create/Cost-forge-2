@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Iterable, List, Mapping, Sequence
+from typing import Iterable, List, Sequence
 
 import pandas as pd
 
@@ -20,30 +20,6 @@ def check_positive(df: pd.DataFrame, cols: Iterable[str]) -> List[str]:
         if (s <= 0).any():
             bad.append(c)
     return bad
-
-
-def validate_all(
-    mats: pd.DataFrame, procs: pd.DataFrame, bom: pd.DataFrame
-) -> Mapping[str, Mapping[str, list]]:
-    rpt = {
-        "materials": {"missing": [], "nonpositive": []},
-        "processes": {"missing": [], "nonpositive": []},
-        "bom": {"missing": [], "nonpositive": []},
-    }
-    rpt["materials"]["missing"] += check_missing(mats, ["material_id", "price_eur_per_kg"])
-    rpt["materials"]["nonpositive"] += check_positive(mats, ["price_eur_per_kg"])
-    rpt["processes"]["missing"] += check_missing(
-        procs,
-        ["process_id", "machine_rate_eur_h", "labor_rate_eur_h", "overhead_pct", "margin_pct"],
-    )
-    rpt["processes"]["nonpositive"] += check_positive(
-        procs, ["machine_rate_eur_h", "labor_rate_eur_h"]
-    )
-    rpt["bom"]["missing"] += check_missing(
-        bom, ["line_id", "material_id", "qty", "mass_kg", "process_route", "runtime_h"]
-    )
-    rpt["bom"]["nonpositive"] += check_positive(bom, ["qty", "mass_kg"])
-    return rpt
 
 
 @dataclass(frozen=True)
