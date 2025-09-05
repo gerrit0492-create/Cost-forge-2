@@ -1,4 +1,4 @@
-name: Bootstrap 2.0 (code + csv repair + smoke)
+name: Bootstrap 2.0 (code + csv repair + smoke + regression)
 
 on:
   workflow_dispatch:
@@ -198,26 +198,51 @@ jobs:
           PY
 
           cat > utils/validators.py <<'PY'
-          from typing import Iterable, List, Mapping
+          from __future__ import annotations
+          from dataclasses import dataclass
+          from typing import Iterable, List, Mapping, Sequence
           import pandas as pd
           def check_missing(df: pd.DataFrame, required: Iterable[str]) -> List[str]:
               req = list(required); return [c for c in req if c not in df.columns]
           def check_positive(df: pd.DataFrame, cols: Iterable[str]) -> List[str]:
-              bad=[]
+              bad=[]; 
               for c in cols:
                   if c not in df.columns: continue
                   s = pd.to_numeric(df[c], errors="coerce")
-                  if (s < 0).any(): bad.append(c)
+                  if (s <= 0).any(): bad.append(c)
               return bad
           def validate_all(mats: pd.DataFrame, procs: pd.DataFrame, bom: pd.DataFrame) -> Mapping[str, Mapping[str, list]]:
-              rpt={"materials":{"missing":[],"negative":[]}, "processes":{"missing":[],"negative":[]}, "bom":{"missing":[],"negative":[]}}
+              rpt={"materials":{"missing":[],"nonpositive":[]}, "processes":{"missing":[],"nonpositive":[]}, "bom":{"missing":[],"nonpositive":[]}}
               rpt["materials"]["missing"] += check_missing(mats, ["material_id","price_eur_per_kg"])
-              rpt["materials"]["negative"] += check_positive(mats, ["price_eur_per_kg"])
+              rpt["materials"]["nonpositive"] += check_positive(mats, ["price_eur_per_kg"])
               rpt["processes"]["missing"] += check_missing(procs, ["process_id","machine_rate_eur_h","labor_rate_eur_h","overhead_pct","margin_pct"])
-              rpt["processes"]["negative"] += check_positive(procs, ["machine_rate_eur_h","labor_rate_eur_h","overhead_pct","margin_pct"])
+              rpt["processes"]["nonpositive"] += check_positive(procs, ["machine_rate_eur_h","labor_rate_eur_h"])
               rpt["bom"]["missing"] += check_missing(bom, ["line_id","material_id","qty","mass_kg","process_route","runtime_h"])
-              rpt["bom"]["negative"] += check_positive(bom, ["qty","mass_kg","runtime_h"])
+              rpt["bom"]["nonpositive"] += check_positive(bom, ["qty","mass_kg"])
               return rpt
+          @dataclass(frozen=True)
+          class Rule:
+              name: str; ok: bool; msg: str
+          def within(df: pd.DataFrame, col: str, lo: float | None, hi: float | None) -> bool:
+              if col not in df.columns: return False
+              s = pd.to_numeric(df[col], errors="coerce"); good = True
+              if lo is not None: good &= (s >= lo).all()
+              if hi is not None: good &= (s <= hi).all()
+              return bool(good)
+          def business_rules(mats: pd.DataFrame, procs: pd.DataFrame, bom: pd.DataFrame) -> List[Rule]:
+              rules: List[Rule] = []
+              rules.append(Rule("rates_positive", within(procs,"machine_rate_eur_h",0.01,None) and within(procs,"labor_rate_eur_h",0.01,None), "Machine- en arbeidsloon moeten > 0 zijn."))
+              rules.append(Rule("overhead_pct_range", within(procs,"overhead_pct",0.0,1.0), "overhead_pct moet tussen 0 en 1 liggen."))
+              rules.append(Rule("margin_pct_range", within(procs,"margin_pct",0.0,1.0), "margin_pct moet tussen 0 en 1 liggen."))
+              rules.append(Rule("qty_min_1", within(bom,"qty",1,None), "qty moet >= 1 zijn."))
+              rules.append(Rule("mass_positive", within(bom,"mass_kg",0.000001,None), "mass_kg moet > 0 zijn."))
+              rules.append(Rule("runtime_nonneg", within(bom,"runtime_h",0.0,None), "runtime_h moet >= 0 zijn."))
+              rules.append(Rule("mat_price_pos", within(mats,"price_eur_per_kg",0.000001,None), "Materiaalprijs moet > 0 zijn."))
+              return rules
+          def summarize_rules(rules: Sequence[Rule]) -> str:
+              return "\n".join(("✅ " if r.ok else "❌ ") + f"{r.name}: " + ("OK" if r.ok else r.msg) for r in rules)
+          def all_rules_ok(rules: Sequence[Rule]) -> bool:
+              return all(r.ok for r in rules)
           PY
 
       - name: Pages
@@ -240,26 +265,31 @@ jobs:
           cat > pages/05_Data_Quality.py <<'PY'
           from utils.safe import guard
           from utils.io import load_bom, load_materials, load_processes
-          from utils.validators import check_missing, check_positive
+          from utils.validators import check_missing, check_positive, business_rules, summarize_rules, all_rules_ok
           import streamlit as st
           def main():
-              st.title("🧪 Data Quality")
+              st.title("🧪 Data Quality + Guardrails")
               mats = load_materials(); procs = load_processes(); bom = load_bom()
               m1 = check_missing(mats, ["material_id","price_eur_per_kg"]); m2 = check_positive(mats, ["price_eur_per_kg"])
               p1 = check_missing(procs, ["process_id","machine_rate_eur_h","labor_rate_eur_h","overhead_pct","margin_pct"])
-              p2 = check_positive(procs, ["machine_rate_eur_h","labor_rate_eur_h","overhead_pct","margin_pct"])
+              p2 = check_positive(procs, ["machine_rate_eur_h","labor_rate_eur_h"])
               b1 = check_missing(bom, ["line_id","material_id","qty","mass_kg","process_route","runtime_h"])
-              b2 = check_positive(bom, ["qty","mass_kg","runtime_h"])
+              b2 = check_positive(bom, ["qty","mass_kg"])
               any_issue = any([m1,m2,p1,p2,b1,b2])
               if any_issue:
                   if m1: st.error(f"materials miss: {m1}")
-                  if m2: st.error(f"materials neg: {m2}")
+                  if m2: st.error(f"materials ≤0: {m2}")
                   if p1: st.error(f"processes miss: {p1}")
-                  if p2: st.error(f"processes neg: {p2}")
+                  if p2: st.error(f"processes ≤0: {p2}")
                   if b1: st.error(f"bom miss: {b1}")
-                  if b2: st.error(f"bom neg: {b2}")
+                  if b2: st.error(f"bom ≤0: {b2}")
               else:
-                  st.success("Alle basischecks OK")
+                  st.success("Structuur OK")
+              st.subheader("Business rules")
+              rules = business_rules(mats, procs, bom)
+              st.code(summarize_rules(rules))
+              if all_rules_ok(rules): st.success("Alle business rules OK")
+              else: st.error("Business rules schendingen: zie boven.")
           guard(main)
           PY
 
@@ -544,6 +574,7 @@ jobs:
         with:
           name: offer-exports
           path: artifacts/
+
   regression:
     needs: smoke
     runs-on: ubuntu-latest
@@ -552,7 +583,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with: { fetch-depth: 0 }
+        with:
+          fetch-depth: 0
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -573,7 +605,10 @@ jobs:
           from utils.io import load_materials, load_processes, load_bom
           from utils.validators import business_rules, summarize_rules, all_rules_ok
 
-          mats = load_materials(); procs = load_processes(); bom = load_bom()
+          mats = load_materials()
+          procs = load_processes()
+          bom = load_bom()
+
           rules = business_rules(mats, procs, bom)
           print(summarize_rules(rules))
           if not all_rules_ok(rules):
@@ -583,22 +618,27 @@ jobs:
       - name: Regression: scenario sanity
         run: |
           python - <<'PY'
-          import math
           from utils.io import load_materials, load_processes, load_bom, load_quotes
           from utils.quotes import apply_best_quotes
           from utils.pricing import compute_costs
 
-          mats = load_materials(); procs = load_processes(); bom = load_bom(); quotes = load_quotes()
+          mats = load_materials()
+          procs = load_processes()
+          bom = load_bom()
+          quotes = load_quotes()
+
           base = compute_costs(apply_best_quotes(mats, quotes), procs, bom)["total_cost"].sum()
 
-          # Scenario’s
-          mats_up = mats.copy(); mats_up["price_eur_per_kg"] *= 1.10
+          mats_up = mats.copy()
+          mats_up["price_eur_per_kg"] *= 1.10
           s1 = compute_costs(apply_best_quotes(mats_up, quotes), procs, bom)["total_cost"].sum()
 
-          procs_up = procs.copy(); procs_up["labor_rate_eur_h"] *= 1.15
+          procs_up = procs.copy()
+          procs_up["labor_rate_eur_h"] *= 1.15
           s2 = compute_costs(apply_best_quotes(mats, quotes), procs_up, bom)["total_cost"].sum()
 
-          procs_m = procs.copy(); procs_m["margin_pct"] = procs_m["margin_pct"] + 0.05
+          procs_m = procs.copy()
+          procs_m["margin_pct"] = procs_m["margin_pct"] + 0.05
           s3 = compute_costs(apply_best_quotes(mats, quotes), procs_m, bom)["total_cost"].sum()
 
           def gt(a,b): return (a - b) > 1e-6
@@ -609,5 +649,6 @@ jobs:
           if not gt(s3, base): print("[FAIL] +5pp marge verhoogt totaal NIET."); ok = False
 
           print("BASE:", base, "S1:", s1, "S2:", s2, "S3:", s3)
-          if not ok: raise SystemExit(1)
+          if not ok:
+              raise SystemExit(1)
           PY
