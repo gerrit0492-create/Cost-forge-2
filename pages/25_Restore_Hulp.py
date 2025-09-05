@@ -1,4 +1,5 @@
 from pathlib import Path
+
 import streamlit as st
 
 H = Path("data/history")
@@ -12,4 +13,6 @@ else:
     else:
         st.write(f"Gevonden snapshots: {len(snaps)}")
         st.table({"snapshots": snaps})
-        st.caption("Start het herstel in GitHub → Actions → “Panic Button: Restore materials_db.csv from history”.")
+        st.caption(
+            "Start het herstel in GitHub → Actions → “Panic Button: Restore materials_db.csv from history”."
+        )
