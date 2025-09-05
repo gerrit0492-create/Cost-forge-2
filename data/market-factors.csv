@@ -1,7 +1,7 @@
-# data/market_factors.csv
-# Je mag comments laten staan; het script negeert ze bij lezen.
+# Je kunt op material_id of commodity matchen. Minstens één van pct_change of factor invullen.
 material_id,commodity,pct_change,factor
 AL6061,Aluminium,3,
 S235,Staal,-2,
-,, ,1.015
 SS_Duplex_14462,RVS,,1.02
+,Aluminium,,1.015
+,Titanium,4,
