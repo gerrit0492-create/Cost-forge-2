@@ -1,3 +1,1 @@
-line_id,material_id,qty,mass_kg,process_route,runtime_h
-L1,AL6061,10,2.4,MILLING_CNC_3AX,0.4
-L2,S235,6,5.0,TURNING_CNC,0.35
+line_id,material_id,qty,mass_kg,process_route,runtime_h\nL1,AL6061,10,2.4,MILLING_CNC_3AX,0.4\nL2,S235,6,5.0,TURNING_CNC,0.35
