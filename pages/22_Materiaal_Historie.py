@@ -1,21 +1,21 @@
 # pages/22_Materiaal_Historie.py
-from io import BytesIO
 import zipfile
 from datetime import datetime
+from io import BytesIO
 from typing import Optional
 
 import pandas as pd
 import streamlit as st
 
-from utils.safe import guard
 from utils.history import (
-    load_materials,
-    save_snapshot_current,
     build_history_df,
-    get_price_series,
     diff_vs_latest,
     find_anomalies,
+    get_price_series,
+    load_materials,
+    save_snapshot_current,
 )
+from utils.safe import guard
 
 
 def _to_csv_bytes(df: pd.DataFrame) -> bytes:
@@ -55,7 +55,9 @@ def main():
         mid = st.sidebar.selectbox("Materiaal", all_ids, index=0)
         sel_ids = [mid]
     else:
-        sel_ids = st.sidebar.multiselect("Materialen", all_ids, default=all_ids[: min(5, len(all_ids))])
+        sel_ids = st.sidebar.multiselect(
+            "Materialen", all_ids, default=all_ids[: min(5, len(all_ids))]
+        )
 
     # Volledige historie voor selectie
     hist = build_history_df(sel_ids).copy()
@@ -76,7 +78,9 @@ def main():
         if isinstance(d_to, datetime):
             d_to = d_to.date()
         if "date" in hist.columns:
-            hist = hist[(hist["date"] >= pd.Timestamp(d_from)) & (hist["date"] <= pd.Timestamp(d_to))]
+            hist = hist[
+                (hist["date"] >= pd.Timestamp(d_from)) & (hist["date"] <= pd.Timestamp(d_to))
+            ]
 
     # ======= Acties (snapshots & diffs) =======
     c1, c2, c3 = st.columns(3)
@@ -133,12 +137,9 @@ def main():
                 st.line_chart(chart)
             st.dataframe(series, use_container_width=True)
         else:
-            wide = (
-                hist.pivot_table(
-                    index="date", columns="material_id", values="price_eur_per_kg", aggfunc="last"
-                )
-                .sort_index()
-            )
+            wide = hist.pivot_table(
+                index="date", columns="material_id", values="price_eur_per_kg", aggfunc="last"
+            ).sort_index()
             st.line_chart(wide)
             with st.expander("Toon tabel (gepivot)"):
                 st.dataframe(wide.reset_index(), use_container_width=True)
