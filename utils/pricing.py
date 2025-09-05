@@ -1,5 +1,3 @@
-
-
 def compute_costs(mats, procs, bom):
     df = bom.merge(mats, on="material_id", how="left").merge(
         procs, left_on="process_route", right_on="process_id", how="left"
