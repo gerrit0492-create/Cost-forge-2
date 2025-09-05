@@ -1,0 +1,91 @@
+name: Ruff Auto-Fix (format + imports + unused)
+
+on:
+  workflow_dispatch: {}   # start handmatig via Actions
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ruff-autofix
+  cancel-in-progress: false
+
+jobs:
+  autofix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Ensure Ruff config (pyproject.toml)
+        run: |
+          cat > pyproject.toml <<'TOML'
+          [tool.ruff]
+          line-length = 100
+          target-version = "py311"
+
+          [tool.ruff.lint]
+          # E = pycodestyle, F = pyflakes, I = isort (import sorting)
+          select = ["E", "F", "I"]
+          # E501 = line too long -> laten we door formatter oplossen
+          ignore = ["E501"]
+
+          [tool.ruff.format]
+          docstring-code-format = true
+          TOML
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install Ruff
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff
+
+      # 1) Formatter wrapt lange regels; 2) Linter fixt imports/unused/enz.
+      - name: Run Ruff format + fix (alleen Python)
+        run: |
+          ruff --version
+          # Format alleen Python-code
+          ruff format utils pages home.py
+          # Lint + auto-fix (I001/E401/F401 etc.)
+          ruff check --fix utils pages home.py
+          # Eindcontrole; laat de job NIET falen (we committen in de volgende stap)
+          ruff check utils pages home.py || true
+
+      - name: Stage changes
+        run: |
+          git add utils pages home.py || true
+          git status --porcelain
+
+      - name: Commit & push (fallback als main protected)
+        shell: bash
+        run: |
+          set -e
+          if git diff --cached --quiet; then
+            echo "ℹ️ Geen Python-wijzigingen om te committen."
+            exit 0
+          fi
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "chore(ruff): auto-format (wrap), sort imports, remove unused"
+
+          # Probeer direct naar main
+          if git push origin HEAD:main; then
+            echo "✅ Gepusht naar main."
+          else
+            echo "ℹ️ main beschermd; gebruik fallback branch."
+            TS=$(date +%Y%m%d-%H%M%S)
+            BR="autofix/ruff-${TS}"
+            git switch -c "$BR"
+            git push -u origin "$BR"
+            echo "::notice title=Compare & merge::https://github.com/${GITHUB_REPOSITORY}/compare/${BR}?expand=1"
+          fi
