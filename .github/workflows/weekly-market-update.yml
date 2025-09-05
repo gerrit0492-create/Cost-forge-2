@@ -1,4 +1,4 @@
-name: "Weekly Market Update (quotes + commodity + sheet + history)"
+name: "Weekly Market Update (URL file or CSV fallback + history)"
 
 on:
   schedule:
@@ -12,8 +12,6 @@ jobs:
   update:
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    env:
-      MARKET_FACTORS_URL: ${{ secrets.MARKET_FACTORS_URL }}  # optioneel
 
     steps:
       - name: Checkout
@@ -45,6 +43,7 @@ jobs:
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add data/materials_db.csv || true
             git add data/history/*.csv || true
+            git add data/market_factors_url.txt || true
             git commit -m "chore: weekly market update (materials + history)"
             if git push origin HEAD:main; then
               echo "Pushed to main."
