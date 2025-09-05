@@ -1,0 +1,75 @@
+name: Public CSV Sync (Nightly & Manual)
+
+on:
+  schedule:
+    - cron: "10 3 * * *"  # elke nacht om 03:10 UTC
+  workflow_dispatch:     # handmatig triggeren ook mogelijk
+
+permissions:
+  contents: write
+
+env:
+  MATERIALS_URL: ${{ secrets.MATERIALS_CSV_URL }}
+  PROCESSES_URL: ${{ secrets.PROCESSES_CSV_URL }}
+  QUOTES_URL: ${{ secrets.QUOTES_CSV_URL }}
+  BOM_URL: ${{ secrets.BOM_CSV_URL }}
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Sync CSVs
+        run: |
+          set -euo pipefail
+          sync_csv() {
+            local url=$1 target=$2 name=$3
+            if [[ -z "$url" ]]; then
+              echo "❌ $name URL is empty; skipping"
+              return
+            fi
+            echo "📥 Downloading $name CSV from: $url"
+            curl -sS "$url" -o "$target.new" || { echo "Download failed for $name"; return 1; }
+            if [[ ! -f "$target" ]] || ! cmp -s "$target.new" "$target"; then
+              mv "$target.new" "$target"
+              echo "✅ Updated $name → $target"
+            else
+              rm "$target.new"
+              echo "ℹ️ No changes for $name"
+            fi
+          }
+
+          # Zorg dat data-mappen bestaan
+          mkdir -p data data/history
+
+          sync_csv "$MATERIALS_URL" "data/materials_db.csv" "Materials"
+          sync_csv "$PROCESSES_URL" "data/processes_db.csv" "Processes"
+          sync_csv "$QUOTES_URL" "data/supplier_quotes.csv" "Quotes"
+          sync_csv "$BOM_URL" "data/bom_template.csv" "BOM"
+
+      - name: Commit & push if changes
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet; then
+            echo "ℹ️ No changes to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/
+          git commit -m "chore: sync CSVs from public Sheets"
+          if git push origin HEAD:main; then
+            echo "✅ Changes pushed to main."
+          else
+            BR="bot/sync-$(date -u +%Y%m%d-%H%M%S)"
+            git checkout -b "$BR"
+            git push -u origin "$BR"
+            echo "::notice title=Open Pull Request::https://github.com/${GITHUB_REPOSITORY}/compare/${BR}?expand=1"
+          fi
