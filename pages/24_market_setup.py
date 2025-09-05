@@ -1,14 +1,17 @@
 # pages/23_Market_Setup.py
 from pathlib import Path
-import streamlit as st
+
 import pandas as pd
+import streamlit as st
 
 URL_FILE = Path("data/market_factors_url.txt")
 LOCAL_CSV = Path("data/market_factors.csv")
 
+
 def save_url(url: str) -> None:
     URL_FILE.parent.mkdir(parents=True, exist_ok=True)
     URL_FILE.write_text(url.strip(), encoding="utf-8")
+
 
 def try_read(url: str):
     try:
@@ -16,6 +19,7 @@ def try_read(url: str):
         return df
     except Exception as e:
         return f"Kon CSV-URL niet lezen: {e}"
+
 
 def try_read_local():
     try:
@@ -25,11 +29,18 @@ def try_read_local():
     except Exception as e:
         return f"Kon lokaal CSV niet lezen: {e}"
 
-st.title("🧩 Market Setup (iPhone-proof)")
-st.caption("Plak je Google Sheet CSV-link hier, of upload handmatig een CSV. De wekelijkse update gebruikt eerst de URL, anders de lokale CSV.")
 
-with st.expander("1) Plak je CSV-URL (Google Sheet → Bestand → Delen → 'Iedereen met link', export=csv)", True):
-    url = st.text_input("CSV-URL", value=(URL_FILE.read_text(encoding="utf-8").strip() if URL_FILE.exists() else ""))
+st.title("🧩 Market Setup (iPhone-proof)")
+st.caption(
+    "Plak je Google Sheet CSV-link hier, of upload handmatig een CSV. De wekelijkse update gebruikt eerst de URL, anders de lokale CSV."
+)
+
+with st.expander(
+    "1) Plak je CSV-URL (Google Sheet → Bestand → Delen → 'Iedereen met link', export=csv)", True
+):
+    url = st.text_input(
+        "CSV-URL", value=(URL_FILE.read_text(encoding="utf-8").strip() if URL_FILE.exists() else "")
+    )
     c1, c2 = st.columns(2)
     with c1:
         if st.button("💾 Opslaan URL"):
@@ -63,7 +74,8 @@ with st.expander("3) Huidige bronnen (controle)", False):
         st.warning("Nog geen URL-bron ingesteld.")
     res_local = try_read_local()
     if isinstance(res_local, pd.DataFrame):
-        st.write(f"Lokaal CSV rijen: {len(res_local)}"); st.dataframe(res_local.head(), use_container_width=True)
+        st.write(f"Lokaal CSV rijen: {len(res_local)}")
+        st.dataframe(res_local.head(), use_container_width=True)
     else:
         st.write(res_local)
 
