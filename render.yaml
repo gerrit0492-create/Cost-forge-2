@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: cost-forge-2
+    env: python
+    region: frankfurt
+    plan: free
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
+    startCommand: streamlit run home.py --server.port $PORT --server.address 0.0.0.0
+    autoDeploy: false
