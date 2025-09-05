@@ -9,6 +9,7 @@ permissions:
 jobs:
   bootstrap:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -849,27 +850,6 @@ jobs:
           guard(main)
           PY
 
-          cat > pages/13_Marktdata.py <<'PY'
-          from utils.safe import guard
-          from utils.market import load_market_csv, yoy_change
-
-          import streamlit as st
-
-
-          def main():
-              st.title("📈 Marktdata (simple)")
-              path = st.text_input("CSV-pad", "data/market.csv")
-              df = load_market_csv(path)
-              st.dataframe(df)
-              series = st.text_input("Serie-naam")
-              if series:
-                  yo = yoy_change(df, series)
-                  st.write("YoY:", "n.v.t." if yo is None else f"{yo * 100:.2f}%")
-
-
-          guard(main)
-          PY
-
           cat > pages/15_Bom_Import.py <<'PY'
           from utils.safe import guard
 
@@ -919,4 +899,155 @@ jobs:
           cat > pages/17_Offerte_Export.py <<'PY'
           from utils.safe import guard
           from utils.docx_export import make_offer_docx
-          from
+          from utils.io import load_bom, load_materials, load_processes, load_quotes
+          from utils.pdf_export import make_offer_pdf
+          from utils.pricing import compute_costs
+          from utils.quotes import apply_best_quotes
+
+          import streamlit as st
+
+
+          def main():
+              st.title("📦 Offerte Export (DOCX & PDF)")
+              mats = load_materials()
+              procs = load_processes()
+              bom = load_bom()
+              quotes = load_quotes()
+              df = compute_costs(apply_best_quotes(mats, quotes), procs, bom)
+              st.metric("Totaal", f"EUR {df['total_cost'].sum():,.2f}")
+              st.download_button("DOCX", make_offer_docx(df), "offerte.docx")
+              st.download_button("PDF", make_offer_pdf(df), "offerte.pdf", "application/pdf")
+
+
+          guard(main)
+          PY
+
+      - name: Ruff auto-fix (after generation)
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff
+          ruff check --fix utils pages home.py
+          ruff check utils pages home.py || true
+
+      - name: Commit & push (fallback if main protected)
+        shell: bash
+        run: |
+          set -e
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "ℹ️ Geen wijzigingen."
+            exit 0
+          fi
+          git commit -m "Bootstrap Cost Forge 2 full + legacy pages (clean code)"
+          if git push origin HEAD:main; then
+            echo "✅ Gecommit naar main."
+          else
+            TS=$(date +%Y%m%d-%H%M%S)
+            BR="bootstrap/${TS}"
+            git branch -f "$BR"
+            git checkout "$BR"
+            git push -u origin "$BR"
+            echo "::notice title=Open Pull Request::https://github.com/${GITHUB_REPOSITORY}/compare/${BR}?expand=1"
+          fi
+
+  smoke:
+    needs: bootstrap
+    if: ${{ always() }}  # <-- draait altijd, ook als bootstrap via fallback ging
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout (latest)
+        uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Ruff check (must be clean)
+        run: ruff check utils pages home.py --output-format=github
+
+      - name: Quick import test
+        run: |
+          python - <<'PY'
+          import importlib, sys
+          mods = [
+              "utils.safe","utils.io","utils.pricing","utils.quotes",
+              "utils.docx_export","utils.pdf_export",
+          ]
+          bad = []
+          for m in mods:
+              try:
+                  importlib.import_module(m)
+              except Exception as e:
+                  bad.append((m, repr(e)))
+          if bad:
+              for m,e in bad:
+                  print(f"[IMPORT FAIL] {m}: {e}")
+              sys.exit(1)
+          print("Imports OK")
+          PY
+
+      - name: CSV schema check
+        run: |
+          python - <<'PY'
+          import sys
+          from utils.io import (
+              SCHEMA_MATERIALS, SCHEMA_PROCESSES, SCHEMA_BOM, SCHEMA_QUOTES,
+              load_materials, load_processes, load_bom, load_quotes,
+          )
+          def check(df, schema, name):
+              missing = [c for c in schema if c not in df.columns]
+              extra   = [c for c in df.columns if c not in schema]
+              if missing:
+                  print(f"[SCHEMA] {name} ontbreekt: {missing}")
+              if extra:
+                  print(f"[SCHEMA] {name} extra kolommen (ok): {extra}")
+              return not missing
+          ok = True
+          ok &= check(load_materials(), SCHEMA_MATERIALS, "materials_db.csv")
+          ok &= check(load_processes(), SCHEMA_PROCESSES, "processes_db.csv")
+          ok &= check(load_bom(), SCHEMA_BOM, "bom_template.csv")
+          ok &= check(load_quotes(), SCHEMA_QUOTES, "supplier_quotes.csv")
+          if not ok:
+              sys.exit(1)
+          print("Schema OK")
+          PY
+
+      - name: E2E compute + exports
+        run: |
+          mkdir -p artifacts
+          python - <<'PY'
+          from utils.io import load_materials, load_processes, load_bom, load_quotes
+          from utils.quotes import apply_best_quotes
+          from utils.pricing import compute_costs
+          from utils.docx_export import make_offer_docx
+          from utils.pdf_export import make_offer_pdf
+
+          mats = load_materials()
+          procs = load_processes()
+          bom = load_bom()
+          quotes = load_quotes()
+
+          df = compute_costs(apply_best_quotes(mats, quotes), procs, bom)
+          assert "total_cost" in df.columns and len(df) >= 1
+
+          open("artifacts/offerte.docx", "wb").write(make_offer_docx(df))
+          open("artifacts/offerte.pdf", "wb").write(make_offer_pdf(df))
+          print("TOTAL:", float(df["total_cost"].sum()))
+          PY
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: offer-exports
+          path: artifacts/
