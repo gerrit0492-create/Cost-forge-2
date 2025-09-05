@@ -4,7 +4,7 @@ on:
   workflow_dispatch: {}   # handmatig starten via Actions
 
 permissions:
-  contents: write         # nodig om te committen/pushen
+  contents: write
 
 concurrency:
   group: ruff-autofix
@@ -32,14 +32,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install ruff
 
-      # 1) Formatter (wrapt & ordent)  2) Linter-fix (imports sorteren, unused weg)
-      - name: Run Ruff format + fix
+      - name: Run Ruff format + fix (alleen Python)
         run: |
           ruff --version
-          # Format alle .py-bestanden
-          ruff format .
-          # Lint + auto-fix (I001/E401/F401 etc.)
-          ruff check --fix .
+          # Format alleen Python-code in utils/, pages/, en home.py
+          ruff format utils pages home.py
+          # Fix lint alleen Python-code
+          ruff check utils pages home.py --fix
 
       - name: Toon diff (voor overzicht)
         run: git status --porcelain && git diff --staged || true
@@ -48,21 +47,17 @@ jobs:
         shell: bash
         run: |
           set -e
-          # Stage alleen Python-bestanden (veilig)
-          git add --all "*.py" "**/*.py" || true
-
+          git add utils pages home.py || true
           if git diff --cached --quiet; then
             echo "ℹ️ Geen Python-wijzigingen om te committen."
             exit 0
           fi
-
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "chore(ruff): auto-format, import sort, remove unused (CI autofix)"
+          git commit -m "chore(ruff): auto-format + lintfix Python files"
 
-          # Eerst proberen direct naar main
           if git push origin HEAD:main; then
-            echo "✅ Gepusht naar main."
+            echo "✅ Direct naar main gepusht."
           else
             echo "ℹ️ main beschermd; gebruik fallback branch."
             TS=$(date +%Y%m%d-%H%M%S)
