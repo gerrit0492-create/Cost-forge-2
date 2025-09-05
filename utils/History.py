@@ -1,10 +1,11 @@
 # utils/history.py
 from __future__ import annotations
-from pathlib import Path
-from dataclasses import dataclass
-from typing import Iterable, List, Optional, Tuple
-from datetime import datetime
+
 import re
+from dataclasses import dataclass
+from datetime import datetime
+from pathlib import Path
+from typing import Iterable, List, Optional
 
 import pandas as pd
 
@@ -17,12 +18,18 @@ MATERIALS_CSV = DATA_DIR / "materials_db.csv"
 try:
     # load_* en schema's blijven beschikbaar via deze module
     from utils.io import (
-        load_materials as _load_materials_io,
         SCHEMA_MATERIALS,
+    )
+    from utils.io import (
+        load_materials as _load_materials_io,
     )
 except Exception:
     _load_materials_io = None  # type: ignore
-    SCHEMA_MATERIALS = {"material_id": "string", "description": "string", "price_eur_per_kg": "float64"}
+    SCHEMA_MATERIALS = {
+        "material_id": "string",
+        "description": "string",
+        "price_eur_per_kg": "float64",
+    }
 
 
 def load_materials() -> pd.DataFrame:
@@ -70,6 +77,7 @@ def save_snapshot_current() -> Path:
 
 # --- Historie opbouwen ---------------------------------------------------------
 
+
 def build_history_df(material_ids: Optional[Iterable[str]] = None) -> pd.DataFrame:
     """
     Bouw een lange tabel met kolommen:
@@ -78,7 +86,9 @@ def build_history_df(material_ids: Optional[Iterable[str]] = None) -> pd.DataFra
     rows: List[dict] = []
     snaps = list_snapshots()
     if not snaps:
-        return pd.DataFrame(columns=["date", "material_id", "price_eur_per_kg", "description", "commodity"])
+        return pd.DataFrame(
+            columns=["date", "material_id", "price_eur_per_kg", "description", "commodity"]
+        )
 
     want = set(str(x) for x in material_ids) if material_ids else None
 
@@ -129,6 +139,7 @@ def get_price_series(material_id: str) -> pd.DataFrame:
 
 # --- Diffs & controles ---------------------------------------------------------
 
+
 def diff_vs_latest() -> pd.DataFrame:
     """
     Vergelijk current materials_db.csv met laatste snapshot.
@@ -153,7 +164,9 @@ def diff_vs_latest() -> pd.DataFrame:
     p["price_eur_per_kg"] = pd.to_numeric(p["price_eur_per_kg"], errors="coerce")
 
     m = p.merge(c, on="material_id", suffixes=("_old", "_new"), how="outer")
-    m["pct_change"] = (m["price_eur_per_kg_new"] - m["price_eur_per_kg_old"]) / m["price_eur_per_kg_old"]
+    m["pct_change"] = (m["price_eur_per_kg_new"] - m["price_eur_per_kg_old"]) / m[
+        "price_eur_per_kg_old"
+    ]
     m = m.rename(columns={"price_eur_per_kg_old": "old_price", "price_eur_per_kg_new": "new_price"})
     return m
 
