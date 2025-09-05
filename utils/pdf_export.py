@@ -11,10 +11,13 @@ def make_offer_pdf(df, title: str = "Offerte") -> bytes:
     doc = SimpleDocTemplate(buf, pagesize=A4)
     styles = getSampleStyleSheet()
     story = []
+
     story.append(Paragraph(f"<b>{title}</b>", styles["Title"]))
     story.append(Spacer(1, 12))
+
     total = float(df["total_cost"].sum())
     story.append(Paragraph(f"Totaalprijs: <b>EUR {total:,.2f}</b>", styles["Normal"]))
+
     headers = ["Line", "Material", "Qty", "Mat. cost", "Proc. cost", "Overhead", "Total"]
     rows = [
         [
@@ -28,6 +31,7 @@ def make_offer_pdf(df, title: str = "Offerte") -> bytes:
         ]
         for _, r in df.iterrows()
     ]
+
     t = Table([headers] + rows)
     t.setStyle(
         TableStyle(
