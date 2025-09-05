@@ -1,10 +1,9 @@
-from utils.safe import guard
+import streamlit as st
+
 from utils.io import load_bom, load_materials, load_processes, load_quotes
 from utils.pricing import compute_costs
 from utils.quotes import apply_best_quotes
-
-import pandas as pd
-import streamlit as st
+from utils.safe import guard
 
 
 def main():
@@ -21,12 +20,25 @@ def main():
         "# Offerte-rapport",
         f"**Totaal (EUR):** {df['total_cost'].sum():,.2f}",
         "",
-        df[["line_id","material_id","qty","material_cost","process_cost","overhead","margin","total_cost"]]
+        df[
+            [
+                "line_id",
+                "material_id",
+                "qty",
+                "material_cost",
+                "process_cost",
+                "overhead",
+                "margin",
+                "total_cost",
+            ]
+        ]
         .round(4)
         .to_markdown(index=False),
     ]
     content = "\n".join(md)
-    st.download_button("Download rapport.md", content.encode("utf-8"), "rapport.md", "text/markdown")
+    st.download_button(
+        "Download rapport.md", content.encode("utf-8"), "rapport.md", "text/markdown"
+    )
     st.code(content, language="markdown")
 
 
