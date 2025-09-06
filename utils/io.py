@@ -31,10 +31,10 @@ SCHEMA_QUOTES = {
 def paths():
     d = Path("data")
     return {
-        "materials": d / "materials_db.csv",
-        "processes": d / "processes_db.csv",
-        "bom": d / "bom_template.csv",
-        "quotes": d / "supplier_quotes.csv",
+        "materials": d / "materials.csv",
+        "processes": d / "processes.csv",
+        "bom": d / "bom.csv",
+        "quotes": d / "quotes.csv",
     }
 
 
