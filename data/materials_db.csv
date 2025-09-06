@@ -1,8 +1,9 @@
-material_id,description,commodity,price_eur_per_kg
-AL6061,Aluminium 6061,Aluminium,4.5
-S235,Staal S235,Staal,1.1
-SS_Duplex_14462,RVS Duplex 1.4462,RVS,6.9
-CNC_Steel_42CrMo4,42CrMo4 CNC staal,Staal,5.25
-Brass_C27000,Messing C27000,Messing,4.0
-ToolSteel_O1,Toolstaal O1,Staal,7.8
-Titanium_TI6AL4V,Titanium 6Al-4V,Titanium,28.5
+material_id,description,density,price_eur_per_kg,supplier
+S235,Staal S235,7.85,1.1,SteelCo
+S355,Staal S355,7.85,1.25,SteelCo
+304,RVS 304,8,3.2,Outokumpu
+316,RVS 316,8,3.8,Outokumpu
+AL6061,Aluminium 6061,2.7,4.5,Metals4U
+AL7075,Aluminium 7075,2.8,6.8,Metals4U
+Ti64,Titanium Ti6Al4V,4.4,28,TitanSup
+POM,Kunststof POM,1.4,2.5,Plastix
