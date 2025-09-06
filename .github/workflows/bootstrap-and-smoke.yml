@@ -105,10 +105,10 @@ jobs:
           def paths():
               d = Path("data")
               return {
-                  "materials": d/"materials_db.csv",
-                  "processes": d/"processes_db.csv",
-                  "bom": d/"bom_template.csv",
-                  "quotes": d/"supplier_quotes.csv",
+                  "materials": d/"materials.csv",
+                  "processes": d/"processes.csv",
+                  "bom": d/"bom.csv",
+                  "quotes": d/"quotes.csv",
               }
 
           def _read_csv(p, schema=None):
@@ -536,10 +536,10 @@ jobs:
           import sys, pandas as pd
           from utils.io import SCHEMA_MATERIALS,SCHEMA_PROCESSES,SCHEMA_BOM,SCHEMA_QUOTES,paths
           SCHEMAS = {
-              "materials_db.csv": (paths()["materials"], SCHEMA_MATERIALS),
-              "processes_db.csv": (paths()["processes"], SCHEMA_PROCESSES),
-              "bom_template.csv": (paths()["bom"], SCHEMA_BOM),
-              "supplier_quotes.csv": (paths()["quotes"], SCHEMA_QUOTES),
+              "materials.csv": (paths()["materials"], SCHEMA_MATERIALS),
+              "processes.csv": (paths()["processes"], SCHEMA_PROCESSES),
+              "bom.csv": (paths()["bom"], SCHEMA_BOM),
+              "quotes.csv": (paths()["quotes"], SCHEMA_QUOTES),
           }
           ok = True
           for name, (p, schema) in SCHEMAS.items():
