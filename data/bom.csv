@@ -1,4 +1,4 @@
 line_id,material_id,qty,mass_kg,process_route,runtime_h
 L1,S235,10,2.4,LASER_CUT,0.3
-L2,AL6061,6,5,CNC_MILL_3AX,0.4
+L2,AL6061,6,5.0,CNC_MILL_3AX,0.4
 L3,316,4,3.2,TIG_WELD,0.5
