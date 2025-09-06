@@ -1,8 +1,8 @@
-process_id,machine_rate,labor_rate,overhead_pct,margin_pct,machine_rate_eur_h,labor_rate_eur_h
-CNC_MILL_3AX,80,45,0.2,0.1,,
-CNC_LATHE,70,40,0.2,0.1,,
-LASER_CUT,65,35,0.15,0.1,,
-BENDING,55,30,0.15,0.1,,
-MIG_WELD,60,35,0.25,0.15,,
-TIG_WELD,70,40,0.25,0.15,,
-3DP_SLM,150,60,0.3,0.2,,
+"process_id","machine_rate","labor_rate","overhead_pct","margin_pct"
+"CNC_MILL_3AX","80","45","0.2","0.1"
+"CNC_LATHE","70","40","0.2","0.1"
+"LASER_CUT","65","35","0.15","0.1"
+"BENDING","55","30","0.15","0.1"
+"MIG_WELD","60","35","0.25","0.15"
+"TIG_WELD","70","40","0.25","0.15"
+"3DP_SLM","150","60","0.3","0.2"
