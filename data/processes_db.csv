@@ -1,3 +1,0 @@
-process_id,machine_rate_eur_h,labor_rate_eur_h,overhead_pct,margin_pct
-MILLING_CNC_3AX,80,45,0.2,0.1
-TURNING_CNC,70,45,0.2,0.1
