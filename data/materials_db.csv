@@ -1,9 +1,9 @@
-"material_id","description","density","price_eur_per_kg","supplier"
-"S235","Staal S235","7.85","1.1","SteelCo"
-"S355","Staal S355","7.85","1.25","SteelCo"
-"304","RVS 304","8","3.2","Outokumpu"
-"316","RVS 316","8","3.8","Outokumpu"
-"AL6061","Aluminium 6061","2.7","4.5","Metals4U"
-"AL7075","Aluminium 7075","2.8","6.8","Metals4U"
-"Ti64","Titanium Ti6Al4V","4.4","28","TitanSup"
-"POM","Kunststof POM","1.4","2.5","Plastix"
+material_id,description,density,price_eur_per_kg,supplier
+S235,Staal S235,7.85,1.1,SteelCo
+S355,Staal S355,7.85,1.25,SteelCo
+304,RVS 304,8.0,3.2,Outokumpu
+316,RVS 316,8.0,3.8,Outokumpu
+AL6061,Aluminium 6061,2.7,4.5,Metals4U
+AL7075,Aluminium 7075,2.8,6.8,Metals4U
+Ti64,Titanium Ti6Al4V,4.4,28.0,TitanSup
+POM,Kunststof POM,1.4,2.5,Plastix
