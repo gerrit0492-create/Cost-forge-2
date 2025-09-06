@@ -1,0 +1,4 @@
+line_id,material_id,qty,mass_kg,process_route,runtime_h,description,density,price_eur_per_kg,supplier,process_id,machine_rate,labor_rate,overhead_pct,margin_pct,material_cost,process_cost,overhead,margin,total_cost
+L1,S235,10,2.4,LASER_CUT,0.3,Staal S235,7.85,1.1,SteelCo,LASER_CUT,65,35,0.15,0.1,2.64,30,4.896,3.7536,41.2896
+L2,AL6061,6,5,CNC_MILL_3AX,0.4,Aluminium 6061,2.7,4.5,Metals4U,CNC_MILL_3AX,80,45,0.2,0.1,22.5,50,14.5,8.700000000000001,95.7
+L3,316,4,3.2,TIG_WELD,0.5,RVS 316,8,3.8,Outokumpu,TIG_WELD,70,40,0.25,0.15,12.16,55,16.79,12.5925,96.54249999999999
