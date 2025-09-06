@@ -1,16 +1,27 @@
-Sat Sep 06 2025 12:24:44 GMT+0200 (Central European Summer Time),materials_db.csv,? Succes (200)
-Sat Sep 06 2025 12:24:45 GMT+0200 (Central European Summer Time),processes_db.csv,? Succes (200)
-Sat Sep 06 2025 12:24:46 GMT+0200 (Central European Summer Time),bom_template.csv,? Succes (200)
-Sat Sep 06 2025 12:24:47 GMT+0200 (Central European Summer Time),supplier_quotes.csv,? Succes (200)
-Sat Sep 06 2025 12:25:06 GMT+0200 (Central European Summer Time),materials_db.csv,? Succes (200)
-Sat Sep 06 2025 12:25:08 GMT+0200 (Central European Summer Time),processes_db.csv,? Succes (200)
-Sat Sep 06 2025 12:25:09 GMT+0200 (Central European Summer Time),bom_template.csv,? Succes (200)
-Sat Sep 06 2025 12:25:10 GMT+0200 (Central European Summer Time),supplier_quotes.csv,? Succes (200)
-Sat Sep 06 2025 12:25:20 GMT+0200 (Central European Summer Time),materials_db.csv,? Succes (200)
-Sat Sep 06 2025 12:25:21 GMT+0200 (Central European Summer Time),processes_db.csv,? Succes (200)
-Sat Sep 06 2025 12:25:22 GMT+0200 (Central European Summer Time),bom_template.csv,? Succes (200)
-Sat Sep 06 2025 12:25:24 GMT+0200 (Central European Summer Time),supplier_quotes.csv,? Succes (200)
-Sat Sep 06 2025 14:19:36 GMT+0200 (Central European Summer Time),materials_db.csv,? Succes (200)
-Sat Sep 06 2025 14:19:38 GMT+0200 (Central European Summer Time),processes_db.csv,? Succes (200)
-Sat Sep 06 2025 14:19:39 GMT+0200 (Central European Summer Time),bom_template.csv,? Succes (200)
-Sat Sep 06 2025 14:19:40 GMT+0200 (Central European Summer Time),supplier_quotes.csv,? Succes (200)
+Sat Sep 06 2025 12:24:44 GMT+0200 (Midden-Europese zomertijd),materials_db.csv,? Succes (200)
+Sat Sep 06 2025 12:24:45 GMT+0200 (Midden-Europese zomertijd),processes_db.csv,? Succes (200)
+Sat Sep 06 2025 12:24:46 GMT+0200 (Midden-Europese zomertijd),bom_template.csv,? Succes (200)
+Sat Sep 06 2025 12:24:47 GMT+0200 (Midden-Europese zomertijd),supplier_quotes.csv,? Succes (200)
+Sat Sep 06 2025 12:25:06 GMT+0200 (Midden-Europese zomertijd),materials_db.csv,? Succes (200)
+Sat Sep 06 2025 12:25:08 GMT+0200 (Midden-Europese zomertijd),processes_db.csv,? Succes (200)
+Sat Sep 06 2025 12:25:09 GMT+0200 (Midden-Europese zomertijd),bom_template.csv,? Succes (200)
+Sat Sep 06 2025 12:25:10 GMT+0200 (Midden-Europese zomertijd),supplier_quotes.csv,? Succes (200)
+Sat Sep 06 2025 12:25:20 GMT+0200 (Midden-Europese zomertijd),materials_db.csv,? Succes (200)
+Sat Sep 06 2025 12:25:21 GMT+0200 (Midden-Europese zomertijd),processes_db.csv,? Succes (200)
+Sat Sep 06 2025 12:25:22 GMT+0200 (Midden-Europese zomertijd),bom_template.csv,? Succes (200)
+Sat Sep 06 2025 12:25:24 GMT+0200 (Midden-Europese zomertijd),supplier_quotes.csv,? Succes (200)
+Sat Sep 06 2025 14:19:36 GMT+0200 (Midden-Europese zomertijd),materials_db.csv,? Succes (200)
+Sat Sep 06 2025 14:19:38 GMT+0200 (Midden-Europese zomertijd),processes_db.csv,? Succes (200)
+Sat Sep 06 2025 14:19:39 GMT+0200 (Midden-Europese zomertijd),bom_template.csv,? Succes (200)
+Sat Sep 06 2025 14:19:40 GMT+0200 (Midden-Europese zomertijd),supplier_quotes.csv,? Succes (200)
+Sat Sep 06 2025 21:16:27 GMT+0200 (Midden-Europese zomertijd),INFO,Markt-update: updated=0, skipped=0
+Sat Sep 06 2025 21:16:43 GMT+0200 (Midden-Europese zomertijd),INFO,Snapshot opgeslagen (Materials?History)
+Sat Sep 06 2025 21:16:58 GMT+0200 (Midden-Europese zomertijd),INFO,undefined
+Sat Sep 06 2025 21:17:03 GMT+0200 (Midden-Europese zomertijd),WARN,undefined
+Sat Sep 06 2025 21:17:08 GMT+0200 (Midden-Europese zomertijd),ERR,undefined
+Sat Sep 06 2025 21:17:25 GMT+0200 (Midden-Europese zomertijd),INFO,Markt-update: updated=0, skipped=0
+Sat Sep 06 2025 21:17:25 GMT+0200 (Midden-Europese zomertijd),INFO,FullRun: markt-update done: {"updated":0,"skipped":0}
+Sat Sep 06 2025 21:17:27 GMT+0200 (Midden-Europese zomertijd),INFO,Snapshot opgeslagen (Materials?History)
+Sat Sep 06 2025 21:28:42 GMT+0200 (Midden-Europese zomertijd),snapshot,Materials ? History
+Sat Sep 06 2025 21:29:02 GMT+0200 (Midden-Europese zomertijd),snapshot,Materials ? History
+Sat Sep 06 2025 21:37:38 GMT+0200 (Midden-Europese zomertijd),snapshot,Materials ? History
