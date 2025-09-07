@@ -30,7 +30,7 @@ jobs:
             if [[ ! -f "data/materials.csv" ]]; then
               echo "❌ data/materials.csv ontbreekt"; exit 1
             fi
-            cp "data/materials_db.csv" "$SNAP"
+            cp "data/materials.csv" "$SNAP"
             echo "📸 Aangemaakt: $SNAP"
           fi
 
