@@ -27,8 +27,8 @@ jobs:
           if [[ -f "$SNAP" ]]; then
             echo "✅ Snapshot voor vandaag bestaat al: $SNAP"
           else
-            if [[ ! -f "data/materials_db.csv" ]]; then
-              echo "❌ data/materials_db.csv ontbreekt"; exit 1
+            if [[ ! -f "data/materials.csv" ]]; then
+              echo "❌ data/materials.csv ontbreekt"; exit 1
             fi
             cp "data/materials_db.csv" "$SNAP"
             echo "📸 Aangemaakt: $SNAP"
