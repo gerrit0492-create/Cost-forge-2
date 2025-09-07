@@ -1,11 +1,23 @@
-material_id,description,price_eur_per_kg,density,supplier,region,last_update
-S235,Staal S235,1.1,7.85,SteelCo,,
-S355,Staal S355,1.25,7.85,SteelCo,,
-304,RVS 304,3.2,8.0,Outokumpu,,
-316,RVS 316,3.8,8.0,Outokumpu,,
-AL6061,Aluminium 6061,4.5,2.7,Metals4U,,
-AL7075,Aluminium 7075,6.8,2.8,Metals4U,,
-Ti64,Titanium Ti6Al4V,28.0,4.4,TitanSup,,
-POM,Kunststof POM,2.5,1.4,Plastix,,
-1.4462,Duplex,3.031,7.85,Outokumpu,,
-Cast aluminium,Cast aluminium,,,Lme,,
+source,commodity,unit,price,currency,fx_to_eur,effective_date,url,notes
+S235,Staal,Plaat,1.25,EUR,1,Sun Sep 07 2025 00:23:10 GMT+0200 (Central European Summer Time),https://www.mcb.eu/,MCB staalprijs (dummy)
+S355,Staal,Plaat,5,EUR,1,Sun Sep 07 2025 00:23:11 GMT+0200 (Central European Summer Time),,Fallback prijs
+1.4301 (304),RVS,Plaat,2.85,EUR,1,Sun Sep 07 2025 00:23:11 GMT+0200 (Central European Summer Time),https://www.outokumpu.com/surcharges,Outokumpu surcharge (dummy)
+1.4404 (316),RVS,Plaat,5,EUR,1,Sun Sep 07 2025 00:23:11 GMT+0200 (Central European Summer Time),,Fallback prijs
+1.4462 (2205),RVS Duplex,Plaat,2.85,EUR,1,Sun Sep 07 2025 00:23:12 GMT+0200 (Central European Summer Time),https://www.outokumpu.com/surcharges,Outokumpu surcharge (dummy)
+1.4410 (2507),RVS Super Duplex,Plaat,2.85,EUR,1,Sun Sep 07 2025 00:23:12 GMT+0200 (Central European Summer Time),https://www.outokumpu.com/surcharges,Outokumpu surcharge (dummy)
+AlMg3 (5754),Aluminium,Plaat,5,EUR,1,Sun Sep 07 2025 00:23:13 GMT+0200 (Central European Summer Time),,Fallback prijs
+AlMg4.5Mn (5083),Aluminium,Plaat,5,EUR,1,Sun Sep 07 2025 00:23:13 GMT+0200 (Central European Summer Time),,Fallback prijs
+AlSi10Mg,Aluminium,Gietstuk,5,EUR,1,Sun Sep 07 2025 00:23:15 GMT+0200 (Central European Summer Time),,Fallback prijs
+AlCu4Mg (2024),Aluminium,Plaat,5,EUR,1,Sun Sep 07 2025 00:23:15 GMT+0200 (Central European Summer Time),,Fallback prijs
+AlZnMgCu1.5 (7075),Aluminium,Plaat,5,EUR,1,Sun Sep 07 2025 00:23:16 GMT+0200 (Central European Summer Time),,Fallback prijs
+Ti6Al4V,Titanium,Plaat,5,EUR,1,Sun Sep 07 2025 00:23:16 GMT+0200 (Central European Summer Time),,Fallback prijs
+Cu-ETP (E-Cu),Koper,Plaat,2.3,EUR,1,Sun Sep 07 2025 00:23:17 GMT+0200 (Central European Summer Time),https://www.lme.com/,LME prijs (dummy via ECB)
+CuSn12,Koper,Gietstuk,2.3,EUR,1,Sun Sep 07 2025 00:23:17 GMT+0200 (Central European Summer Time),https://www.lme.com/,LME prijs (dummy via ECB)
+CuZn37 (Ms63),Messing,Plaat,5,EUR,1,Sun Sep 07 2025 00:23:18 GMT+0200 (Central European Summer Time),,Fallback prijs
+GG25,Gietijzer,Gietstuk,5,EUR,1,Sun Sep 07 2025 00:23:18 GMT+0200 (Central European Summer Time),,Fallback prijs
+EN-GJS-400-15 (GGG40),Sfero Gietijzer,Gietstuk,5,EUR,1,Sun Sep 07 2025 00:23:19 GMT+0200 (Central European Summer Time),,Fallback prijs
+PA6,Nylon,Plaat,5,EUR,1,Sun Sep 07 2025 00:23:19 GMT+0200 (Central European Summer Time),,Fallback prijs
+POM,Delrin,Plaat,5,EUR,1,Sun Sep 07 2025 00:23:20 GMT+0200 (Central European Summer Time),,Fallback prijs
+PTFE,Teflon,Plaat,5,EUR,1,Sun Sep 07 2025 00:23:20 GMT+0200 (Central European Summer Time),,Fallback prijs
+PE-HD,Polyethyleen,Plaat,5,EUR,1,Sun Sep 07 2025 00:23:20 GMT+0200 (Central European Summer Time),,Fallback prijs
+PMMA (Acryl),Kunststof,Plaat,5,EUR,1,Sun Sep 07 2025 00:23:21 GMT+0200 (Central European Summer Time),,Fallback prijs
