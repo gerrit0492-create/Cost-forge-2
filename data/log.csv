@@ -26,3 +26,54 @@ Sat Sep 06 2025 21:28:42 GMT+0200 (Midden-Europese zomertijd),snapshot,Materials
 Sat Sep 06 2025 21:29:02 GMT+0200 (Midden-Europese zomertijd),snapshot,Materials ? History
 Sat Sep 06 2025 21:37:38 GMT+0200 (Midden-Europese zomertijd),snapshot,Materials ? History
 Sat Sep 06 2025 21:38:56 GMT+0200 (Midden-Europese zomertijd),snapshot,Materials ? History
+Mon Sep 08 2025 15:29:08 GMT+0200 (Midden-Europese zomertijd),INFO,Snapshot opgeslagen
+Mon Sep 08 2025 15:29:09 GMT+0200 (Midden-Europese zomertijd),INFO,Verschillen: [{"col":7,"before":"2025-09-08T04:51:54.876Z","now":"2025-09-08T04:51:54.876Z"}]
+Mon Sep 08 2025 15:29:27 GMT+0200 (Midden-Europese zomertijd),WARN,Sheet OutokumpuData niet gevonden
+Mon Sep 08 2025 15:29:27 GMT+0200 (Midden-Europese zomertijd),INFO,Geen match gevonden voor staal, fallback blijft
+Mon Sep 08 2025 15:29:27 GMT+0200 (Midden-Europese zomertijd),WARN,Sheet OutokumpuData niet gevonden
+Mon Sep 08 2025 15:29:28 GMT+0200 (Midden-Europese zomertijd),INFO,Geen match gevonden voor staal, fallback blijft
+Mon Sep 08 2025 15:29:28 GMT+0200 (Midden-Europese zomertijd),WARN,Sheet OutokumpuData niet gevonden
+Mon Sep 08 2025 15:29:28 GMT+0200 (Midden-Europese zomertijd),INFO,Geen match gevonden voor rvs, fallback blijft
+Mon Sep 08 2025 15:29:28 GMT+0200 (Midden-Europese zomertijd),WARN,Sheet OutokumpuData niet gevonden
+Mon Sep 08 2025 15:29:29 GMT+0200 (Midden-Europese zomertijd),INFO,Geen match gevonden voor rvs, fallback blijft
+Mon Sep 08 2025 15:29:29 GMT+0200 (Midden-Europese zomertijd),WARN,Sheet OutokumpuData niet gevonden
+Mon Sep 08 2025 15:29:30 GMT+0200 (Midden-Europese zomertijd),INFO,Geen match gevonden voor 1.4462, fallback blijft
+Mon Sep 08 2025 15:29:30 GMT+0200 (Midden-Europese zomertijd),WARN,Sheet OutokumpuData niet gevonden
+Mon Sep 08 2025 15:29:30 GMT+0200 (Midden-Europese zomertijd),INFO,Geen match gevonden voor rvs super duplex, fallback blijft
+Mon Sep 08 2025 15:29:32 GMT+0200 (Midden-Europese zomertijd),ERROR,Sheet LMEData mist kolommen 'commodity' of 'eur_per_kg'
+Mon Sep 08 2025 15:29:32 GMT+0200 (Midden-Europese zomertijd),INFO,Geen match gevonden voor aluminium, fallback blijft
+Mon Sep 08 2025 15:29:33 GMT+0200 (Midden-Europese zomertijd),ERROR,Sheet LMEData mist kolommen 'commodity' of 'eur_per_kg'
+Mon Sep 08 2025 15:29:33 GMT+0200 (Midden-Europese zomertijd),INFO,Geen match gevonden voor aluminium, fallback blijft
+Mon Sep 08 2025 15:29:35 GMT+0200 (Midden-Europese zomertijd),ERROR,Sheet LMEData mist kolommen 'commodity' of 'eur_per_kg'
+Mon Sep 08 2025 15:29:35 GMT+0200 (Midden-Europese zomertijd),INFO,Geen match gevonden voor aluminium, fallback blijft
+Mon Sep 08 2025 15:29:36 GMT+0200 (Midden-Europese zomertijd),ERROR,Sheet LMEData mist kolommen 'commodity' of 'eur_per_kg'
+Mon Sep 08 2025 15:29:36 GMT+0200 (Midden-Europese zomertijd),INFO,Geen match gevonden voor aluminium, fallback blijft
+Mon Sep 08 2025 15:29:37 GMT+0200 (Midden-Europese zomertijd),ERROR,Sheet LMEData mist kolommen 'commodity' of 'eur_per_kg'
+Mon Sep 08 2025 15:29:38 GMT+0200 (Midden-Europese zomertijd),INFO,Geen match gevonden voor aluminium, fallback blijft
+Mon Sep 08 2025 15:29:39 GMT+0200 (Midden-Europese zomertijd),WARN,Sheet OutokumpuData niet gevonden
+Mon Sep 08 2025 15:29:39 GMT+0200 (Midden-Europese zomertijd),INFO,Geen match gevonden voor titanium, fallback blijft
+Mon Sep 08 2025 15:29:40 GMT+0200 (Midden-Europese zomertijd),WARN,Sheet OutokumpuData niet gevonden
+Mon Sep 08 2025 15:29:41 GMT+0200 (Midden-Europese zomertijd),INFO,Geen match gevonden voor koper, fallback blijft
+Mon Sep 08 2025 15:29:41 GMT+0200 (Midden-Europese zomertijd),WARN,Sheet OutokumpuData niet gevonden
+Mon Sep 08 2025 15:29:41 GMT+0200 (Midden-Europese zomertijd),INFO,Geen match gevonden voor koper, fallback blijft
+Mon Sep 08 2025 15:29:42 GMT+0200 (Midden-Europese zomertijd),ERROR,MCB fout voor messing: Exception: Request failed for https://www.mcb.eu returned code 404. Truncated server response: <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3c.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html prefix="og: http:/... (use muteHttpExceptions option to examine full response)
+Mon Sep 08 2025 15:29:43 GMT+0200 (Midden-Europese zomertijd),INFO,Geen match gevonden voor messing, fallback blijft
+Mon Sep 08 2025 15:29:43 GMT+0200 (Midden-Europese zomertijd),WARN,Sheet OutokumpuData niet gevonden
+Mon Sep 08 2025 15:29:43 GMT+0200 (Midden-Europese zomertijd),INFO,Geen match gevonden voor gietijzer, fallback blijft
+Mon Sep 08 2025 15:29:44 GMT+0200 (Midden-Europese zomertijd),WARN,Sheet OutokumpuData niet gevonden
+Mon Sep 08 2025 15:29:45 GMT+0200 (Midden-Europese zomertijd),INFO,Geen match gevonden voor sfero gietijzer, fallback blijft
+Mon Sep 08 2025 15:29:45 GMT+0200 (Midden-Europese zomertijd),INFO,Geen match gevonden voor nylon, fallback blijft
+Mon Sep 08 2025 15:29:46 GMT+0200 (Midden-Europese zomertijd),INFO,Geen match gevonden voor delrin, fallback blijft
+Mon Sep 08 2025 15:29:47 GMT+0200 (Midden-Europese zomertijd),INFO,Geen match gevonden voor teflon, fallback blijft
+Mon Sep 08 2025 15:29:47 GMT+0200 (Midden-Europese zomertijd),INFO,Geen match gevonden voor polyethyleen, fallback blijft
+Mon Sep 08 2025 15:29:48 GMT+0200 (Midden-Europese zomertijd),INFO,Geen match gevonden voor kunststof, fallback blijft
+Mon Sep 08 2025 15:29:49 GMT+0200 (Midden-Europese zomertijd),INFO,Push naar GitHub: materials.csv ? 200
+Mon Sep 08 2025 15:29:51 GMT+0200 (Midden-Europese zomertijd),INFO,Push naar GitHub: history.csv ? 200
+Mon Sep 08 2025 15:32:16 GMT+0200 (Midden-Europese zomertijd),INFO,Snapshot opgeslagen
+Mon Sep 08 2025 15:32:18 GMT+0200 (Midden-Europese zomertijd),INFO,Verschillen: [{"col":7,"before":"2025-09-08T04:51:54.876Z","now":"2025-09-08T04:51:54.876Z"}]
+Mon Sep 08 2025 15:32:30 GMT+0200 (Midden-Europese zomertijd),INFO,Push naar GitHub: materials.csv ? 200
+Mon Sep 08 2025 15:32:31 GMT+0200 (Midden-Europese zomertijd),INFO,Push naar GitHub: processes.csv ? 200
+Mon Sep 08 2025 15:32:33 GMT+0200 (Midden-Europese zomertijd),INFO,Push naar GitHub: quotes.csv ? 200
+Mon Sep 08 2025 15:32:36 GMT+0200 (Midden-Europese zomertijd),INFO,Push naar GitHub: costs.csv ? 200
+Mon Sep 08 2025 15:32:38 GMT+0200 (Midden-Europese zomertijd),INFO,Push naar GitHub: bom.csv ? 200
