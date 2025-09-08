@@ -54,3 +54,47 @@ Mon Sep 08 2025 11:41:16 GMT+0200 (Central European Summer Time),POM,Delrin,Plaa
 Mon Sep 08 2025 11:41:17 GMT+0200 (Central European Summer Time),PTFE,Teflon,Plaat,5,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
 Mon Sep 08 2025 11:41:17 GMT+0200 (Central European Summer Time),PE-HD,Polyethyleen,Plaat,5,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
 Mon Sep 08 2025 11:41:18 GMT+0200 (Central European Summer Time),PMMA (Acryl),Kunststof,Plaat,5,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
+Mon Sep 08 2025 11:42:47 GMT+0200 (Central European Summer Time),S235,Staal,Plaat,1.25,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
+Mon Sep 08 2025 11:42:47 GMT+0200 (Central European Summer Time),S355,Staal,Plaat,5,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
+Mon Sep 08 2025 11:42:47 GMT+0200 (Central European Summer Time),1.4301 (304),RVS,Plaat,2.85,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
+Mon Sep 08 2025 11:42:48 GMT+0200 (Central European Summer Time),1.4404 (316),RVS,Plaat,5,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
+Mon Sep 08 2025 11:42:48 GMT+0200 (Central European Summer Time),1.4462 (2205),RVS Duplex,Plaat,2.85,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
+Mon Sep 08 2025 11:42:48 GMT+0200 (Central European Summer Time),1.4410 (2507),RVS Super Duplex,Plaat,2.85,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
+Mon Sep 08 2025 11:42:48 GMT+0200 (Central European Summer Time),AlMg3 (5754),Aluminium,Plaat,5,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
+Mon Sep 08 2025 11:42:49 GMT+0200 (Central European Summer Time),AlMg4.5Mn (5083),Aluminium,Plaat,5,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
+Mon Sep 08 2025 11:42:49 GMT+0200 (Central European Summer Time),AlSi10Mg,Aluminium,Gietstuk,5,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
+Mon Sep 08 2025 11:42:50 GMT+0200 (Central European Summer Time),AlCu4Mg (2024),Aluminium,Plaat,5,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
+Mon Sep 08 2025 11:42:50 GMT+0200 (Central European Summer Time),AlZnMgCu1.5 (7075),Aluminium,Plaat,5,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
+Mon Sep 08 2025 11:42:50 GMT+0200 (Central European Summer Time),Ti6Al4V,Titanium,Plaat,5,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
+Mon Sep 08 2025 11:42:51 GMT+0200 (Central European Summer Time),Cu-ETP (E-Cu),Koper,Plaat,2.3,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
+Mon Sep 08 2025 11:42:51 GMT+0200 (Central European Summer Time),CuSn12,Koper,Gietstuk,2.3,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
+Mon Sep 08 2025 11:42:54 GMT+0200 (Central European Summer Time),CuZn37 (Ms63),Messing,Plaat,5,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
+Mon Sep 08 2025 11:42:54 GMT+0200 (Central European Summer Time),GG25,Gietijzer,Gietstuk,5,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
+Mon Sep 08 2025 11:42:56 GMT+0200 (Central European Summer Time),EN-GJS-400-15 (GGG40),Sfero Gietijzer,Gietstuk,5,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
+Mon Sep 08 2025 11:42:56 GMT+0200 (Central European Summer Time),PA6,Nylon,Plaat,5,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
+Mon Sep 08 2025 11:42:57 GMT+0200 (Central European Summer Time),POM,Delrin,Plaat,5,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
+Mon Sep 08 2025 11:42:57 GMT+0200 (Central European Summer Time),PTFE,Teflon,Plaat,5,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
+Mon Sep 08 2025 11:42:57 GMT+0200 (Central European Summer Time),PE-HD,Polyethyleen,Plaat,5,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
+Mon Sep 08 2025 11:42:58 GMT+0200 (Central European Summer Time),PMMA (Acryl),Kunststof,Plaat,5,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
+Mon Sep 08 2025 11:44:34 GMT+0200 (Central European Summer Time),S235,Staal,Plaat,1.25,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
+Mon Sep 08 2025 11:44:34 GMT+0200 (Central European Summer Time),S355,Staal,Plaat,5,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
+Mon Sep 08 2025 11:44:35 GMT+0200 (Central European Summer Time),1.4301 (304),RVS,Plaat,2.85,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
+Mon Sep 08 2025 11:44:35 GMT+0200 (Central European Summer Time),1.4404 (316),RVS,Plaat,5,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
+Mon Sep 08 2025 11:44:35 GMT+0200 (Central European Summer Time),1.4462 (2205),RVS Duplex,Plaat,3.032,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
+Mon Sep 08 2025 11:44:35 GMT+0200 (Central European Summer Time),1.4410 (2507),RVS Super Duplex,Plaat,2.85,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
+Mon Sep 08 2025 11:44:35 GMT+0200 (Central European Summer Time),AlMg3 (5754),Aluminium,Plaat,5,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
+Mon Sep 08 2025 11:44:36 GMT+0200 (Central European Summer Time),AlMg4.5Mn (5083),Aluminium,Plaat,5,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
+Mon Sep 08 2025 11:44:36 GMT+0200 (Central European Summer Time),AlSi10Mg,Aluminium,Gietstuk,5,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
+Mon Sep 08 2025 11:44:37 GMT+0200 (Central European Summer Time),AlCu4Mg (2024),Aluminium,Plaat,5,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
+Mon Sep 08 2025 11:44:37 GMT+0200 (Central European Summer Time),AlZnMgCu1.5 (7075),Aluminium,Plaat,5,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
+Mon Sep 08 2025 11:44:37 GMT+0200 (Central European Summer Time),Ti6Al4V,Titanium,Plaat,5,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
+Mon Sep 08 2025 11:44:37 GMT+0200 (Central European Summer Time),Cu-ETP (E-Cu),Koper,Plaat,2.3,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
+Mon Sep 08 2025 11:44:37 GMT+0200 (Central European Summer Time),CuSn12,Koper,Gietstuk,2.3,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
+Mon Sep 08 2025 11:44:37 GMT+0200 (Central European Summer Time),CuZn37 (Ms63),Messing,Plaat,5,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
+Mon Sep 08 2025 11:44:38 GMT+0200 (Central European Summer Time),GG25,Gietijzer,Gietstuk,5,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
+Mon Sep 08 2025 11:44:39 GMT+0200 (Central European Summer Time),EN-GJS-400-15 (GGG40),Sfero Gietijzer,Gietstuk,5,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
+Mon Sep 08 2025 11:44:39 GMT+0200 (Central European Summer Time),PA6,Nylon,Plaat,5,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
+Mon Sep 08 2025 11:44:39 GMT+0200 (Central European Summer Time),POM,Delrin,Plaat,5,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
+Mon Sep 08 2025 11:44:40 GMT+0200 (Central European Summer Time),PTFE,Teflon,Plaat,5,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
+Mon Sep 08 2025 11:44:40 GMT+0200 (Central European Summer Time),PE-HD,Polyethyleen,Plaat,5,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
+Mon Sep 08 2025 11:44:40 GMT+0200 (Central European Summer Time),PMMA (Acryl),Kunststof,Plaat,5,EUR,1,Mon Sep 08 2025 06:51:54 GMT+0200 (Central European Summer Time),,Fallback prijs
