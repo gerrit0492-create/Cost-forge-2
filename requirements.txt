@@ -1,4 +1,3 @@
-tabulate
 streamlit>=1.36
 pandas>=2.2
 python-docx>=1.1.0
